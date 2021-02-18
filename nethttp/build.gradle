@@ -1,0 +1,10 @@
+apply plugin: 'kotlin'
+apply plugin: 'java-library'
+
+dependencies {
+    compileOnly("androidx.annotation:annotation:1.1.0")
+    api("com.squareup.okhttp3:okhttp:4.9.0")
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
