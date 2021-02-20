@@ -1,0 +1,10 @@
+apply plugin: 'kotlin'
+apply plugin: 'java-library'
+
+dependencies {
+    api project(':nethttp-download:common')
+    api project(':nethttp-ext:rx')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8

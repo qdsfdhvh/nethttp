@@ -14,12 +14,23 @@ interface ExecuteParser<out T> : Parser<T> {
 }
 
 @WorkerThread
-fun <T> NetHttp.Call.toParse(parser: Parser<T>): T {
+fun <T> NetHttp.Call.useParse(parser: Parser<T>): T {
   return newCall().execute().use(parser::onParse)
 }
 
-internal fun <T> Parser<T>.asExecuteParser(netHttp: NetHttp.Call): ExecuteParser<T> {
+@WorkerThread
+fun <T> NetHttp.Call.letParse(parser: Parser<T>): T {
+  return newCall().execute().let(parser::onParse)
+}
+
+internal fun <T> Parser<T>.useExecuteParser(netHttp: NetHttp.Call): ExecuteParser<T> {
   return object : ExecuteParser<T>, Parser<T> by this {
-    override fun execute(): T = netHttp.toParse(this@asExecuteParser)
+    override fun execute(): T = netHttp.useParse(this)
+  }
+}
+
+internal fun <T> Parser<T>.letExecuteParser(netHttp: NetHttp.Call): ExecuteParser<T> {
+  return object : ExecuteParser<T>, Parser<T> by this {
+    override fun execute(): T = netHttp.letParse(this)
   }
 }

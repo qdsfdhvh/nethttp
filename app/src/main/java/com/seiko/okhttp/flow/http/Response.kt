@@ -1,14 +1,21 @@
 package com.seiko.okhttp.flow.http
 
 import com.seiko.net.NetHttp
+import com.seiko.net.createSingle
 import com.seiko.net.exception.ParseException
-import com.seiko.net.getActualTypeParameter
 import com.seiko.net.parser.Parser
-import com.seiko.net.parser.toParse
-import com.seiko.net.throwIfFatal
+import com.seiko.net.parser.useParse
+import com.seiko.net.util.getActualTypeParameter
+import com.seiko.net.util.throwIfFatal
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 @JsonClass(generateAdapter = true)
 data class Response<T>(
@@ -35,11 +42,11 @@ open class ResponseParser<T>(
   }
 }
 
-inline fun <reified T : Any> NetHttp.Call.toResponse() =
-  toParse(object : ResponseParser<T>(this) {})
+inline fun <reified T : Any> NetHttp.Call.toResponse(): T =
+  useParse(object : ResponseParser<T>(this) {})
 
-inline fun <reified T : Any> NetHttp.Call.asFlowResponse() =
-  flowIO { emit(toResponse<T>()) }
+inline fun <reified T : Any> NetHttp.Call.asFlowResponse(): Flow<T> =
+  flow { emit(toResponse<T>()) }.flowOn(Dispatchers.IO)
 
-inline fun <reified T : Any> NetHttp.Call.asSingleResponse() =
-  createSingle { toResponse<T>() }
+inline fun <reified T : Any> NetHttp.Call.asSingleResponse(): Single<T> =
+  createSingle { toResponse<T>() }.subscribeOn(Schedulers.io())

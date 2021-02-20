@@ -37,20 +37,17 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 
     implementation project(':nethttp')
     implementation project(':nethttp-converter:moshi')
     implementation project(':nethttp-converter:gson')
 //    implementation project(':nethttp-converter:kotlinx')
-
-    implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
-
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
-
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
+    implementation project(':nethttp-download:flow')
+    implementation project(':nethttp-download:rx')
 
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
 

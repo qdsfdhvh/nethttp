@@ -13,13 +13,13 @@ private object StringParser : Parser<String> {
 }
 
 fun NetHttp.Call.asOkResponse(): ExecuteParser<Response> =
-  OkResponseParser.asExecuteParser(this)
+  OkResponseParser.letExecuteParser(this)
 
 fun NetHttp.Call.asBodyString(): ExecuteParser<String> =
-  StringParser.asExecuteParser(this)
+  StringParser.useExecuteParser(this)
 
 @WorkerThread
-fun NetHttp.Call.toOkResponse(): Response = toParse(OkResponseParser)
+fun NetHttp.Call.toOkResponse(): Response = letParse(OkResponseParser)
 
 @WorkerThread
-fun NetHttp.Call.toBodyString(): String = toParse(StringParser)
+fun NetHttp.Call.toBodyString(): String = useParse(StringParser)

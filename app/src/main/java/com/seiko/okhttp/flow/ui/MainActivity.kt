@@ -1,6 +1,7 @@
 package com.seiko.okhttp.flow.ui
 
 import android.os.Bundle
+import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -8,14 +9,23 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.seiko.net.NetHttp
+import com.seiko.net.asFlow
+import com.seiko.net.asSingle
+import com.seiko.net.download.downloadFlow
+import com.seiko.net.download.downloadRx
 import com.seiko.net.param.get
 import com.seiko.net.param.post
 import com.seiko.net.parser.toConvert
 import com.seiko.okhttp.flow.R
-import com.seiko.okhttp.flow.http.*
+import com.seiko.okhttp.flow.http.DownloadNetHttp
+import com.seiko.okhttp.flow.http.GsonNetHttp
+import com.seiko.okhttp.flow.http.Response
+import com.seiko.okhttp.flow.http.asFlowResponse
 import com.seiko.okhttp.flow.model.TestData
 import com.seiko.okhttp.flow.model.response.BannerResponse
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,6 +36,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
   private lateinit var textBody: TextView
 
+  private val compositeDisposable = CompositeDisposable()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
@@ -34,6 +46,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     findViewById<Button>(R.id.btn_rx).setOnClickListener(this)
     findViewById<Button>(R.id.btn_response).setOnClickListener(this)
     findViewById<Button>(R.id.btn_parse).setOnClickListener(this)
+    findViewById<Button>(R.id.btn_download_rx).setOnClickListener(this)
+    findViewById<Button>(R.id.btn_download_flow).setOnClickListener(this)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    compositeDisposable.dispose()
   }
 
   override fun onClick(v: View) {
@@ -42,6 +61,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
       R.id.btn_rx -> clickRx()
       R.id.btn_response -> clickResponse()
       R.id.btn_parse -> clickParse()
+      R.id.btn_download_rx -> clickDownloadRx()
+      R.id.btn_download_flow -> clickDownloadFlow()
     }
   }
 
@@ -61,6 +82,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
       .asSingle<Response<List<BannerResponse>>>()
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe { it, _ -> showBody(it.data?.get(1).toString()) }
+      .addToDisposables()
   }
 
   private fun clickResponse() {
@@ -82,6 +104,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
       }
       showBody(response.data?.get(3).toString())
     }
+  }
+
+  private fun clickDownloadRx() {
+    DownloadNetHttp.downloadRx(
+      url = "https://dldir1.qq.com/weixin/android/weixin706android1460.apk",
+      savePath = getExternalFilesDir(DIRECTORY_DOWNLOADS)!!.absolutePath,
+      saveName = "微信",
+    ).observeOn(AndroidSchedulers.mainThread())
+      .subscribe {
+        showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
+      }.addToDisposables()
+  }
+
+  private fun clickDownloadFlow() {
+    DownloadNetHttp.downloadFlow(
+      url = "https://tfs.alipayobjects.com/L1/71/100/and/alipay_2088231010784741_yifan44.apk",
+      savePath = getExternalFilesDir(DIRECTORY_DOWNLOADS)!!.absolutePath,
+      saveName = "支付宝",
+    ).onEach {
+      showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
+    }.launchIn(lifecycleScope)
+  }
+
+  private fun Disposable.addToDisposables() {
+    compositeDisposable.add(this)
   }
 
   private fun showBody(body: String) {

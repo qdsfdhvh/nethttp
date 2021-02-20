@@ -27,6 +27,10 @@ class GetParamFlowHttp internal constructor(
 
   fun addHeader(name: String, value: String) = apply { headersBuilder.add(name, value) }
 
+  fun addHeaders(headers: Map<String, String>) = apply {
+    headers.forEach { entry -> headersBuilder.add(entry.key, entry.value) }
+  }
+
   private fun addQuery(key: String, value: Any, encode: Boolean) = apply {
     queryParams.add(QueryParam(key, value, encode))
   }

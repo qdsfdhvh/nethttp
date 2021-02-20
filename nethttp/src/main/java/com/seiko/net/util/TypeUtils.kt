@@ -1,11 +1,8 @@
-package com.seiko.net
+package com.seiko.net.util
 
-import com.seiko.net.exception.HttpStatusCodeException
-import okhttp3.Response
-import okhttp3.ResponseBody
-import java.io.Serializable
-import java.lang.reflect.*
-import java.util.*
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.lang.reflect.WildcardType
 
 fun getParameterUpperBound(type: ParameterizedType, index: Int): Type {
   val types = type.actualTypeArguments
@@ -25,9 +22,4 @@ fun getActualTypeParameter(clazz: Class<*>, index: Int): Type {
     throw RuntimeException("Missing type parameter.")
   }
   return getParameterUpperBound(superClass, index)
-}
-
-fun Response.throwIfFatal(): ResponseBody {
-  if (isSuccessful) return body!!
-  throw HttpStatusCodeException(this)
 }

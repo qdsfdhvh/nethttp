@@ -1,0 +1,10 @@
+apply plugin: 'kotlin'
+apply plugin: 'java-library'
+
+dependencies {
+    api project(':nethttp')
+    api 'io.reactivex.rxjava3:rxjava:3.0.6'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
