@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':nethttp')
-    api "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
+    api "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

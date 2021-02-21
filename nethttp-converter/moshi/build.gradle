@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':nethttp')
-    api("com.squareup.moshi:moshi-kotlin:1.11.0")
+    api "com.squareup.moshi:moshi-kotlin:$versions.moshi"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

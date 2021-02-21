@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':nethttp')
-    api 'io.reactivex.rxjava3:rxjava:3.0.6'
+    api "io.reactivex.rxjava3:rxjava:$versions.rxjava3"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

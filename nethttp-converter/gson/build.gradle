@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':nethttp')
-    api("com.google.code.gson:gson:2.8.6")
+    api "com.google.code.gson:gson:$versions.gson"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
