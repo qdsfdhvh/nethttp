@@ -1,141 +1,95 @@
 package com.seiko.okhttp.flow.ui
 
 import android.os.Bundle
-import android.os.Environment.DIRECTORY_DOWNLOADS
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.seiko.net.NetHttp
-import com.seiko.net.asFlow
-import com.seiko.net.asSingle
-import com.seiko.net.download.downloadFlow
-import com.seiko.net.download.downloadRx
-import com.seiko.net.param.get
-import com.seiko.net.param.post
-import com.seiko.net.parser.toConvert
-import com.seiko.okhttp.flow.R
-import com.seiko.okhttp.flow.http.DownloadNetHttp
-import com.seiko.okhttp.flow.http.GsonNetHttp
-import com.seiko.okhttp.flow.http.Response
-import com.seiko.okhttp.flow.http.asFlowResponse
-import com.seiko.okhttp.flow.model.TestData
-import com.seiko.okhttp.flow.model.response.BannerResponse
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : ComponentActivity() {
 
-  private lateinit var textBody: TextView
-
-  private val compositeDisposable = CompositeDisposable()
+  private val viewModel: MainViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    textBody = findViewById(R.id.body)
-    findViewById<Button>(R.id.btn_flow).setOnClickListener(this)
-    findViewById<Button>(R.id.btn_rx).setOnClickListener(this)
-    findViewById<Button>(R.id.btn_response).setOnClickListener(this)
-    findViewById<Button>(R.id.btn_parse).setOnClickListener(this)
-    findViewById<Button>(R.id.btn_download_rx).setOnClickListener(this)
-    findViewById<Button>(R.id.btn_download_flow).setOnClickListener(this)
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    compositeDisposable.dispose()
-  }
-
-  override fun onClick(v: View) {
-    when (v.id) {
-      R.id.btn_flow -> clickFlow()
-      R.id.btn_rx -> clickRx()
-      R.id.btn_response -> clickResponse()
-      R.id.btn_parse -> clickParse()
-      R.id.btn_download_rx -> clickDownloadRx()
-      R.id.btn_download_flow -> clickDownloadFlow()
-    }
-  }
-
-  private fun clickFlow() {
-    NetHttp.get("banner/json")
-      .add("a", "aaa")
-      .asFlow<Response<List<BannerResponse>>>()
-      .onEach { showBody(it.data?.get(0).toString()) }
-      .launchIn(lifecycleScope)
-  }
-
-  private fun clickRx() {
-    GsonNetHttp.post("banner/json")
-      .add("a", "aaa")
-      .add("b", TestData(1, "20"))
-      .add("c", listOf("1", "2", "3"))
-      .asSingle<Response<List<BannerResponse>>>()
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe { it, _ -> showBody(it.data?.get(1).toString()) }
-      .addToDisposables()
-  }
-
-  private fun clickResponse() {
-    NetHttp.post("banner/json")
-      .body(TestData(11, "22"))
-      .asFlowResponse<List<BannerResponse>>()
-      .onEach { showBody(it[2].toString()) }
-      .launchIn(lifecycleScope)
-  }
-
-  private fun clickParse() {
-    lifecycleScope.launch {
-      val response = withContext(Dispatchers.IO) {
-        NetHttp.post("banner/json")
-          .add("a", "aaa")
-          .add("b", TestData(1, "20"))
-          .add("c", listOf("1", "2", "3"))
-          .toConvert<Response<List<BannerResponse>>>()
+    setContent {
+      MaterialTheme {
+        MainScene(viewModel)
       }
-      showBody(response.data?.get(3).toString())
     }
   }
+}
 
-  private fun clickDownloadRx() {
-    DownloadNetHttp.downloadRx(
-      url = "https://dldir1.qq.com/weixin/android/weixin706android1460.apk",
-      savePath = getExternalFilesDir(DIRECTORY_DOWNLOADS)!!.absolutePath,
-      saveName = "微信",
-    ).observeOn(AndroidSchedulers.mainThread())
-      .subscribe {
-        showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
-      }.addToDisposables()
-  }
+@Composable
+private fun MainScene(
+  viewModel: MainViewModel
+) {
+  val body by viewModel.body.observeAsState("")
 
-  private fun clickDownloadFlow() {
-    DownloadNetHttp.downloadFlow(
-      url = "https://tfs.alipayobjects.com/L1/71/100/and/alipay_2088231010784741_yifan44.apk",
-      savePath = getExternalFilesDir(DIRECTORY_DOWNLOADS)!!.absolutePath,
-      saveName = "支付宝",
-    ).onEach {
-      showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
-    }.launchIn(lifecycleScope)
-  }
+  val context = LocalContext.current
 
-  private fun Disposable.addToDisposables() {
-    compositeDisposable.add(this)
+  Surface(
+    modifier = Modifier
+      .background(Color.White)
+      .fillMaxSize()
+  ) {
+    Column {
+      Row {
+        MyTextButton("Flow") { viewModel.clickFlow() }
+        MyTextButton("Rx") { viewModel.clickRx() }
+        MyTextButton("Response") { viewModel.clickResponse() }
+        MyTextButton("Parse") { viewModel.clickParse() }
+      }
+      Row {
+        MyTextButton("Download-Flow") {
+          viewModel.clickDownloadFlow(context)
+        }
+        MyTextButton("Download-Rx") {
+          viewModel.clickDownloadRx(context)
+        }
+      }
+      Text(
+        text = body,
+        modifier = Modifier.padding(6.dp)
+      )
+    }
   }
+}
 
-  private fun showBody(body: String) {
-    textBody.text = body
+@Composable
+private fun MyTextButton(
+  text: String,
+  onClick: () -> Unit
+) {
+  Button(
+    onClick = onClick,
+    modifier = Modifier.padding(6.dp)
+  ) {
+    Text(text = text)
   }
+}
 
-  private fun toast(msg: String?) {
-    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-  }
+@Preview(showBackground = true)
+@Composable
+private fun MyTextButtonPreview() {
+  MyTextButton(
+    text = "按钮",
+    onClick = {}
+  )
 }
