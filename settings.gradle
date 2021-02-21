@@ -1,5 +1,5 @@
 rootProject.name = "NetHttp"
-include ':app'
+include ':sample'
 include ':nethttp'
 include ':nethttp-converter:gson'
 include ':nethttp-converter:kotlinx'
