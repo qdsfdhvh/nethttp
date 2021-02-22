@@ -6,7 +6,7 @@ import com.seiko.net.exception.ParseException
 import com.seiko.net.parser.Parser
 import com.seiko.net.parser.useParse
 import com.seiko.net.scheduler
-import com.seiko.net.util.getActualTypeParameter
+import com.seiko.net.util.TypeLiteral
 import com.seiko.net.util.throwIfFatal
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.internal.operators.single.SingleFromCallable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.lang.reflect.Type
 
 @JsonClass(generateAdapter = true)
 data class Response<T>(
@@ -24,14 +25,14 @@ data class Response<T>(
   val data: T? = null
 )
 
-open class ResponseParser<T>(
+class ResponseParser<T>(
   private val netHttp: NetHttp.Call,
+  private val type: Type,
 ) : Parser<T> {
   @Suppress("UNCHECKED_CAST")
   override fun onParse(response: okhttp3.Response): T {
-    var type = getActualTypeParameter(javaClass, 0)
-    type = Types.newParameterizedType(Response::class.java, type)
-    val result = netHttp.converter().convert<Response<T>>(response.throwIfFatal(), type)
+    val responseType = Types.newParameterizedType(Response::class.java, type)
+    val result = netHttp.converter().convert<Response<T>>(response.throwIfFatal(), responseType)
     if (result.code == 0) {
       val data = result.data
       if (data != null) return data
@@ -43,7 +44,7 @@ open class ResponseParser<T>(
 }
 
 inline fun <reified T : Any> NetHttp.Call.toResponse(): T =
-  useParse(object : ResponseParser<T>(this) {})
+  useParse(ResponseParser(this, object : TypeLiteral<T>() {}.type))
 
 inline fun <reified T : Any> NetHttp.Call.asFlowResponse(): Flow<T> =
   flow { emit(toResponse<T>()) }.flowOn(dispatcher())
