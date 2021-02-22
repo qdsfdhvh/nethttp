@@ -4,8 +4,8 @@ import com.seiko.net.download.util.formatSize
 import com.seiko.net.download.util.ratio
 
 class Progress(
-  var downloadSize: Long = 0,
   val totalSize: Long = 0,
+  var downloadSize: Long = 0,
 ) {
 
   fun totalSizeStr(): String = totalSize.formatSize()

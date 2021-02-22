@@ -1,6 +1,5 @@
 package com.seiko.net.download
 
-import com.seiko.net.download.util.recreate
 import com.seiko.net.download.util.shadow
 import com.seiko.net.util.throwIfFatal
 import io.reactivex.rxjava3.core.Emitter
@@ -12,54 +11,25 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import okhttp3.internal.closeQuietly
 import okhttp3.internal.headersContentLength
-import okio.*
-import java.io.File
+import okio.buffer
+import okio.sink
 
-class NormalRxDownloader : RxDownloader {
+class NormalRxDownloader : DownloaderDelegate(), RxDownloader {
 
-  private var alreadyDownloaded = false
+  override fun download(taskInfo: TaskInfo, response: Response): Flowable<Progress> {
+    val body = response.throwIfFatal()
 
-  private lateinit var file: File
-  private lateinit var shadowFile: File
-
-  override fun download(task: Task, response: Response): Flowable<Progress> {
+    val task = taskInfo.task
     file = task.getFile()
     shadowFile = file.shadow()
 
     beforeDownload(task, response)
 
     val totalSize = response.headersContentLength()
-
-    return if (alreadyDownloaded) {
-      Flowable.just(
-        Progress(
-          downloadSize = totalSize,
-          totalSize = totalSize,
-        )
-      )
-    } else {
-      startDownload(
-        response.throwIfFatal(), Progress(
-          totalSize = totalSize,
-        )
-      )
+    if (alreadyDownloaded) {
+      return Flowable.just(Progress(totalSize, totalSize))
     }
-  }
-
-  private fun beforeDownload(task: Task, response: Response) {
-    val fileDir = task.getDir()
-    if (!fileDir.exists() || !fileDir.isDirectory) {
-      fileDir.mkdirs()
-    }
-
-    if (file.exists()) {
-      if (file.length() == response.headersContentLength()) {
-        alreadyDownloaded = true
-        return
-      }
-      file.delete()
-    }
-    shadowFile.recreate()
+    return startDownload(body, Progress(totalSize))
   }
 
   private fun startDownload(body: ResponseBody, progress: Progress): Flowable<Progress> {
@@ -72,7 +42,7 @@ class NormalRxDownloader : RxDownloader {
       },
       BiConsumer<InternalState, Emitter<Progress>> { internalState, emitter ->
         internalState.apply {
-          val readLen = source.read(buffer, 8192L)
+          val readLen = source.read(buffer, DEFAULT_BUFFER_SIZE)
           if (readLen == -1L) {
             sink.flush()
             shadowFile.renameTo(file)
@@ -89,14 +59,9 @@ class NormalRxDownloader : RxDownloader {
         it.apply {
           sink.closeQuietly()
           source.closeQuietly()
+          body.closeQuietly()
         }
       }
     )
   }
-
-  private class InternalState(
-    val source: BufferedSource,
-    val sink: BufferedSink,
-    val buffer: Buffer = sink.buffer
-  )
 }

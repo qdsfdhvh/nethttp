@@ -1,6 +1,5 @@
 package com.seiko.net.download
 
-import com.seiko.net.download.util.recreate
 import com.seiko.net.download.util.shadow
 import com.seiko.net.util.throwIfFatal
 import kotlinx.coroutines.flow.Flow
@@ -10,54 +9,25 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import okhttp3.internal.closeQuietly
 import okhttp3.internal.headersContentLength
-import okio.*
-import java.io.File
+import okio.buffer
+import okio.sink
 
-class NormalFlowDownloader : FlowDownloader {
+class NormalFlowDownloader : DownloaderDelegate(), FlowDownloader {
 
-  private var alreadyDownloaded = false
+  override fun download(taskInfo: TaskInfo, response: Response): Flow<Progress> {
+    val body = response.throwIfFatal()
 
-  private lateinit var file: File
-  private lateinit var shadowFile: File
-
-  override fun download(task: Task, response: Response): Flow<Progress> {
+    val task = taskInfo.task
     file = task.getFile()
     shadowFile = file.shadow()
 
     beforeDownload(task, response)
 
     val totalSize = response.headersContentLength()
-
-    return if (alreadyDownloaded) {
-      flowOf(
-        Progress(
-          downloadSize = totalSize,
-          totalSize = totalSize,
-        )
-      )
-    } else {
-      startDownload(
-        response.throwIfFatal(), Progress(
-          totalSize = totalSize,
-        )
-      )
+    if (alreadyDownloaded) {
+      return flowOf(Progress(totalSize, totalSize))
     }
-  }
-
-  private fun beforeDownload(task: Task, response: Response) {
-    val fileDir = task.getDir()
-    if (!fileDir.exists() || !fileDir.isDirectory) {
-      fileDir.mkdirs()
-    }
-
-    if (file.exists()) {
-      if (file.length() == response.headersContentLength()) {
-        alreadyDownloaded = true
-        return
-      }
-      file.delete()
-    }
-    shadowFile.recreate()
+    return startDownload(body, Progress(totalSize))
   }
 
   @Suppress("BlockingMethodInNonBlockingContext")
@@ -68,26 +38,21 @@ class NormalFlowDownloader : FlowDownloader {
         shadowFile.sink().buffer()
       ).apply {
 
-        var readLean = source.read(buffer, 8192L)
+        var readLean = source.read(buffer, DEFAULT_BUFFER_SIZE)
         while (readLean != -1L) {
           sink.emit()
           emit(progress.apply {
             downloadSize += readLean
           })
-          readLean = source.read(buffer, 8192L)
+          readLean = source.read(buffer, DEFAULT_BUFFER_SIZE)
         }
         sink.flush()
         shadowFile.renameTo(file)
 
         sink.closeQuietly()
         source.closeQuietly()
+        body.closeQuietly()
       }
     }
   }
-
-  private class InternalState(
-    val source: BufferedSource,
-    val sink: BufferedSink,
-    val buffer: Buffer = sink.buffer
-  )
 }

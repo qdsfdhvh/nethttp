@@ -3,7 +3,7 @@ package com.seiko.net.download.util
 import java.math.RoundingMode
 
 fun Long.formatSize(): String {
-  require(this >= 0) { "Size must larger than 0." }
+  if (this <= 0L) return ""
 
   val byte = this.toDouble()
   val kb = byte / 1024.0

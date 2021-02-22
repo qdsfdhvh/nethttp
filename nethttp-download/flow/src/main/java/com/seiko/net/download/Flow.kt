@@ -1,10 +1,7 @@
 package com.seiko.net.download
 
 import com.seiko.net.NetHttp
-import com.seiko.net.asFlowOkResponse
-import com.seiko.net.param.get
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import com.seiko.net.dispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
@@ -16,26 +13,37 @@ fun NetHttp.downloadFlow(
   savePath: String,
   saveName: String = "",
   headers: Map<String, String> = RANGE_CHECK_HEADER,
-  downloader: FlowDownloader = NormalFlowDownloader(),
-  dispatcher: CoroutineDispatcher = Dispatchers.IO,
-): Flow<Progress> = downloadFlow(
-  task = Task(url, savePath, saveName),
-  headers = headers,
-  downloader = downloader,
-  dispatcher = dispatcher,
-)
+  maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
+  rangeSize: Long = DEFAULT_RANGE_SIZE,
+  downloader: FlowDownloader = FlowDownloaderProxy,
+): Flow<Progress> =
+  downloadFlow(
+    task = Task(url, savePath, saveName),
+    headers = headers,
+    maxConCurrency = maxConCurrency,
+    rangeSize = rangeSize,
+    downloader = downloader,
+  )
 
 @OptIn(FlowPreview::class)
 fun NetHttp.downloadFlow(
   task: Task,
   headers: Map<String, String> = RANGE_CHECK_HEADER,
-  downloader: FlowDownloader = NormalFlowDownloader(),
-  dispatcher: CoroutineDispatcher = Dispatchers.IO,
-): Flow<Progress> = get(task.url)
-  .addHeaders(headers)
-  .asFlowOkResponse(dispatcher)
-  .flatMapConcat { response ->
-    downloader.download(task, response)
-  }
-  .conflate()
-  .flowOn(dispatcher)
+  maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
+  rangeSize: Long = DEFAULT_RANGE_SIZE,
+  downloader: FlowDownloader = FlowDownloaderProxy,
+): Flow<Progress> {
+  require(rangeSize > 1024 * 1024) { "rangeSize must be greater than 1M" }
+  val taskInfo = TaskInfo(
+    task = task,
+    maxConCurrency = maxConCurrency,
+    rangeSize = rangeSize,
+    netHttp = this
+  )
+  return downloader.get(taskInfo, headers)
+    .flatMapConcat { response ->
+      downloader.download(taskInfo, response)
+        .flowOn(dispatcher())
+    }
+    .conflate()
+}

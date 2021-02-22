@@ -24,10 +24,12 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class MainViewModel : ViewModel() {
 
@@ -40,6 +42,7 @@ class MainViewModel : ViewModel() {
     NetHttp.get("banner/json")
       .add("a", "aaa")
       .asFlow<Response<List<BannerResponse>>>()
+      .catch { Timber.w(it) }
       .onEach { showBody(it.data?.get(0).toString()) }
       .launchIn(viewModelScope)
   }
@@ -51,7 +54,9 @@ class MainViewModel : ViewModel() {
       .add("c", listOf("1", "2", "3"))
       .asSingle<Response<List<BannerResponse>>>()
       .observeOn(AndroidSchedulers.mainThread())
-      .subscribe { it, _ -> showBody(it.data?.get(1).toString()) }
+      .subscribe({
+        showBody(it.data?.get(1).toString())
+      }, { Timber.w(it) })
       .addToDisposables()
   }
 
@@ -59,20 +64,26 @@ class MainViewModel : ViewModel() {
     NetHttp.post("banner/json")
       .body(TestData(11, "22"))
       .asFlowResponse<List<BannerResponse>>()
+      .catch { Timber.w(it) }
       .onEach { showBody(it[2].toString()) }
       .launchIn(viewModelScope)
   }
 
   fun clickParse() {
     viewModelScope.launch {
-      val response = withContext(Dispatchers.IO) {
-        NetHttp.post("banner/json")
-          .add("a", "aaa")
-          .add("b", TestData(1, "20"))
-          .add("c", listOf("1", "2", "3"))
-          .toConvert<Response<List<BannerResponse>>>()
+      runCatching {
+        withContext(Dispatchers.IO) {
+          NetHttp.post("banner/json")
+            .add("a", "aaa")
+            .add("b", TestData(1, "20"))
+            .add("c", listOf("1", "2", "3"))
+            .toConvert<Response<List<BannerResponse>>>()
+        }
+      }.onSuccess {
+        showBody(it.data?.get(3).toString())
+      }.onFailure {
+        Timber.w(it)
       }
-      showBody(response.data?.get(3).toString())
     }
   }
 
@@ -84,19 +95,22 @@ class MainViewModel : ViewModel() {
         saveName = "微信",
       )
       .observeOn(AndroidSchedulers.mainThread())
-      .subscribe {
+      .subscribe({
         showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
-      }
+      }, {
+        Timber.w(it)
+      })
       .addToDisposables()
   }
 
   fun clickDownloadFlow(context: Context) {
     DownloadNetHttp
       .downloadFlow(
-        url = "https://tfs.alipayobjects.com/L1/71/100/and/alipay_2088231010784741_yifan44.apk",
+        url = "https://dldir1.qq.com/weixin/android/weixin706android1460.apk",
         savePath = context.defaultDownloadDir(),
-        saveName = "支付宝",
+        saveName = "微信-Flow",
       )
+      .catch { Timber.w(it) }
       .onEach {
         showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
       }

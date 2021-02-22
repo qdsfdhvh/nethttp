@@ -1,34 +1,43 @@
 package com.seiko.net.download
 
 import com.seiko.net.NetHttp
-import com.seiko.net.asSingleOkResponse
-import com.seiko.net.param.get
+import com.seiko.net.scheduler
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 fun NetHttp.downloadRx(
   url: String,
   savePath: String,
   saveName: String = "",
   headers: Map<String, String> = RANGE_CHECK_HEADER,
-  downloader: RxDownloader = NormalRxDownloader(),
-  scheduler: Scheduler = Schedulers.io(),
-): Flowable<Progress> = downloadRx(
-  task = Task(url, savePath, saveName),
-  headers = headers,
-  downloader = downloader,
-  scheduler = scheduler,
-)
+  maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
+  rangeSize: Long = DEFAULT_RANGE_SIZE,
+  downloader: RxDownloader = RxDownloadProxy,
+): Flowable<Progress> =
+  downloadRx(
+    task = Task(url, savePath, saveName),
+    headers = headers,
+    maxConCurrency = maxConCurrency,
+    rangeSize = rangeSize,
+    downloader = downloader,
+  )
 
 fun NetHttp.downloadRx(
   task: Task,
   headers: Map<String, String> = RANGE_CHECK_HEADER,
-  downloader: RxDownloader = NormalRxDownloader(),
-  scheduler: Scheduler = Schedulers.io()
-): Flowable<Progress> = get(task.url)
-  .addHeaders(headers)
-  .asSingleOkResponse(scheduler)
-  .flatMapPublisher { response ->
-    downloader.download(task, response)
-  }
+  maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
+  rangeSize: Long = DEFAULT_RANGE_SIZE,
+  downloader: RxDownloader = RxDownloadProxy,
+): Flowable<Progress> {
+  require(rangeSize > 1024 * 1024) { "rangeSize must be greater than 1M" }
+  val taskInfo = TaskInfo(
+    task = task,
+    maxConCurrency = maxConCurrency,
+    rangeSize = rangeSize,
+    netHttp = this
+  )
+  return downloader.get(taskInfo, headers)
+    .flatMapPublisher { response ->
+      downloader.download(taskInfo, response)
+        .subscribeOn(scheduler())
+    }
+}
