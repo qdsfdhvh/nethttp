@@ -22,13 +22,9 @@ open class Task(
     }
   }
 
-  override fun hashCode(): Int {
-    return tag().hashCode()
-  }
+  override fun hashCode(): Int = tag().hashCode()
 
-  fun getDir(): File {
-    return File(savePath)
-  }
+  fun getDir(): File = File(savePath)
 
   fun getFile(): File {
     val saveName = if (saveName.isNotEmpty()) saveName else getFileNameFromUrl(url)

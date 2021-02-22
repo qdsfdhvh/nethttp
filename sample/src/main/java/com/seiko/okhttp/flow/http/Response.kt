@@ -7,7 +7,7 @@ import com.seiko.net.parser.Parser
 import com.seiko.net.parser.useParse
 import com.seiko.net.scheduler
 import com.seiko.net.util.TypeLiteral
-import com.seiko.net.util.throwIfFatal
+import com.seiko.net.util.convert
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
@@ -32,7 +32,7 @@ class ResponseParser<T>(
   @Suppress("UNCHECKED_CAST")
   override fun onParse(response: okhttp3.Response): T {
     val responseType = Types.newParameterizedType(Response::class.java, type)
-    val result = netHttp.converter().convert<Response<T>>(response.throwIfFatal(), responseType)
+    val result = netHttp.converter().convert<Response<T>>(response, responseType)
     if (result.code == 0) {
       val data = result.data
       if (data != null) return data

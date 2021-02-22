@@ -96,7 +96,7 @@ class MainViewModel : ViewModel() {
       )
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({
-        showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
+        showBody("${it.downloadSizeFormat}/${it.totalSizeFormat}")
       }, {
         Timber.w(it)
       })
@@ -112,7 +112,7 @@ class MainViewModel : ViewModel() {
       )
       .catch { Timber.w(it) }
       .onEach {
-        showBody("${it.downloadSizeStr()}/${it.totalSizeStr()}")
+        showBody("${it.downloadSizeFormat}/${it.totalSizeFormat}")
       }
       .launchIn(viewModelScope)
   }

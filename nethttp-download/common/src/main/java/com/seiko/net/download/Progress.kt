@@ -7,12 +7,8 @@ class Progress(
   val totalSize: Long = 0,
   var downloadSize: Long = 0,
 ) {
-
-  fun totalSizeStr(): String = totalSize.formatSize()
-
-  fun downloadSizeStr(): String = downloadSize.formatSize()
-
-  fun percent(): Double = downloadSize ratio totalSize
-
-  fun percentStr(): String = "${percent()}%"
+  val totalSizeFormat get() = totalSize.formatSize()
+  val downloadSizeFormat get() = downloadSize.formatSize()
+  val percent get() = downloadSize ratio totalSize
+  val percentFormat get() = "${percent}%"
 }
