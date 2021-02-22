@@ -73,6 +73,8 @@ dependencies {
 
     ksp "dev.zacsweers.moshix:moshi-ksp:$versions.moshi_ksp"
 
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
