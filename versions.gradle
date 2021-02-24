@@ -16,6 +16,7 @@ ext {
             moshi                 : '1.11.0',
             moshi_ksp             : '0.9.1',
             gson                  : '2.8.6',
+            fastjson              : '1.2.75',
             kotlinx_serialization : '1.0.1',
     ]
 }
