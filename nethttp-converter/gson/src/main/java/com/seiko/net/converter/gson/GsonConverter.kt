@@ -13,6 +13,7 @@ import okhttp3.ResponseBody
 import okio.Buffer
 import java.lang.reflect.Type
 
+@Suppress("UNCHECKED_CAST")
 class GsonConverter private constructor(
   private val gson: Gson
 ) : Converter {
