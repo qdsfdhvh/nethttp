@@ -22,7 +22,7 @@ class MoshiConverter private constructor(
 ) : Converter {
 
   override fun <T> convert(value: T, type: Type): RequestBody {
-    var adapter = moshi.adapter<T>(wrapperType(type))
+    var adapter = moshi.adapter<T>(wrapperType(value, type))
     if (lenient) {
       adapter = adapter.lenient()
     }
@@ -62,10 +62,10 @@ class MoshiConverter private constructor(
     }
   }
 
-  private fun wrapperType(type: Type): Type {
-    return when(type) {
-      HashMap::class.java -> Map::class.java
-      LinkedHashMap::class.java -> Map::class.java
+  private fun <T> wrapperType(value: T, type: Type): Type {
+    return when (value) {
+      is Map<*, *> -> Map::class.java
+      is List<*> -> List::class.java
       else -> type
     }
   }
