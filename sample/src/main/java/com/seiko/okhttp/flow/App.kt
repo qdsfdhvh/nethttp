@@ -13,7 +13,7 @@ class App : Application() {
     Timber.plant(Timber.DebugTree())
 
     NetHttp.init(Global.okHttpClient, MoshiConverter.create(Global.moshi))
-    NetHttp.setBaseUrl("https://www.wanandroid.com/")
+    NetHttp.baseUrl = "https://www.wanandroid.com/"
   }
 
 }

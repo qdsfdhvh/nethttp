@@ -14,3 +14,12 @@ open class TypeLiteral<T> {
 fun <T> Converter.convert(response: Response, type: Type): T {
   return convert(response.throwIfFatal(), type)
 }
+
+/**
+ * baseUrl endWith '/'
+ */
+fun wrapperUrl(baseUrl: String, url: String): String {
+  if (url.startsWith("http")) return url
+  if (url.startsWith("/")) return baseUrl + url.substring(1)
+  return "$baseUrl$url"
+}

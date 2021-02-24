@@ -1,6 +1,7 @@
 package com.seiko.net
 
 import androidx.annotation.WorkerThread
+import com.seiko.net.util.wrapperUrl
 import okhttp3.OkHttpClient
 
 interface NetHttp {
@@ -18,10 +19,12 @@ interface NetHttp {
 
   companion object : NetHttp {
 
-    private var baseUrl: String = ""
+    var baseUrl: String = ""
+      set(value) {
+        field = if (value.endsWith('/')) value else "${value}/"
+      }
 
     private lateinit var okHttpClient: OkHttpClient
-
     private lateinit var converter: Converter
 
     fun init(okHttpClient: OkHttpClient, converter: Converter) {
@@ -29,18 +32,10 @@ interface NetHttp {
       this.converter = converter
     }
 
-    fun setBaseUrl(baseUrl: String) {
-      this.baseUrl = if (baseUrl.endsWith("/")) baseUrl else "${baseUrl}/"
-    }
-
     override fun converter(): Converter = converter
 
     override fun okHttpClient(): OkHttpClient = okHttpClient
 
-    override fun wrapperUrl(url: String): String {
-      if (url.startsWith("http")) return url
-      if (url.startsWith("/")) return baseUrl + url.substring(1)
-      return "$baseUrl$url"
-    }
+    override fun wrapperUrl(url: String): String = wrapperUrl(baseUrl, url)
   }
 }
