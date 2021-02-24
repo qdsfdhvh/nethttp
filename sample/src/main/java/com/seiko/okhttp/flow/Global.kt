@@ -10,6 +10,7 @@ import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 import okhttp3.logging.HttpLoggingInterceptor.Level.HEADERS
+import java.util.concurrent.TimeUnit
 
 object Global {
 
@@ -36,6 +37,9 @@ object Global {
   private fun createDownloadOkHttpClient(): OkHttpClient {
     return OkHttpClient.Builder()
       .addInterceptor(createLoggingInterceptor(HEADERS))
+      .connectTimeout(30, TimeUnit.SECONDS)
+      .writeTimeout(15, TimeUnit.SECONDS)
+      .readTimeout(15, TimeUnit.SECONDS)
       .build()
   }
 

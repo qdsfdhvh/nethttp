@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.seiko.okhttp.flow.ui.scene.CoroutineScene
 import com.seiko.okhttp.flow.ui.scene.DownloadScene
 import com.seiko.okhttp.flow.ui.scene.RxJavaScene
+import com.seiko.okhttp.flow.ui.scene.UploadScene
 import com.seiko.okhttp.flow.vm.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -62,6 +63,7 @@ private fun MainScene(
     when (currentTab) {
       Tabs.RxJava -> RxJavaScene()
       Tabs.Coroutine -> CoroutineScene()
+      Tabs.Upload -> UploadScene()
       Tabs.Download -> DownloadScene()
     }
   }
@@ -70,5 +72,6 @@ private fun MainScene(
 enum class Tabs {
   RxJava,
   Coroutine,
+  Upload,
   Download;
 }

@@ -2,10 +2,9 @@ package com.seiko.net.util
 
 import com.seiko.net.exception.HttpStatusCodeException
 import com.seiko.net.model.KeyValue
-import okhttp3.FormBody
-import okhttp3.HttpUrl
-import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import java.net.URLConnection
 
 fun Response.throwIfFatal(): ResponseBody {
   if (isSuccessful) return body!!
@@ -36,4 +35,19 @@ fun FormBody.Builder.addParams(
     }
   }
   return this
+}
+
+fun MultipartBody.Builder.addParts(
+  parts: Collection<MultipartBody.Part>
+): MultipartBody.Builder {
+  parts.forEach { part ->
+    addPart(part)
+  }
+  return this
+}
+
+fun String.getMediaType(): MediaType {
+  val fileSuffix = substringAfterLast('.')
+  val contentType = URLConnection.guessContentTypeFromName(fileSuffix)
+  return contentType.toMediaType()
 }
