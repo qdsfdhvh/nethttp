@@ -20,3 +20,9 @@ fun NetHttp.scheduler(): Scheduler {
   }
   return DEFAULT_SCHEDULER
 }
+
+fun NetHttp.setScheduler(scheduler: Scheduler): RxNetHttp {
+  return object : RxNetHttp, NetHttp by this {
+    override fun scheduler(): Scheduler = scheduler
+  }
+}

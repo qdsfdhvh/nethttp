@@ -13,5 +13,8 @@ fun NetHttp.Call.asSingleOkResponse(): Single<Response> =
 fun NetHttp.Call.asSingleString(): Single<String> =
   SingleFromCallable { toBodyString() }.subscribeOn(scheduler())
 
+fun <T> NetHttp.Call.asSingle(cls: Class<T>): Single<T> =
+  SingleFromCallable { toConvert<T>(cls) }.subscribeOn(scheduler())
+
 inline fun <reified T> NetHttp.Call.asSingle(): Single<T> =
   SingleFromCallable { toConvert<T>() }.subscribeOn(scheduler())

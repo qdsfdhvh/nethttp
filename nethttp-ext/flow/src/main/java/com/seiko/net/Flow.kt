@@ -14,5 +14,8 @@ fun NetHttp.Call.asFlowOkResponse(): Flow<Response> =
 fun NetHttp.Call.asFlowString(): Flow<String> =
   flow { emit(toBodyString()) }.flowOn(dispatcher())
 
+fun <T> NetHttp.Call.asFlow(cls: Class<T>): Flow<T> =
+  flow { emit(toConvert<T>(cls)) }.flowOn(dispatcher())
+
 inline fun <reified T> NetHttp.Call.asFlow(): Flow<T> =
   flow { emit(toConvert<T>()) }.flowOn(dispatcher())

@@ -20,3 +20,9 @@ fun NetHttp.dispatcher(): CoroutineDispatcher {
   }
   return DEFAULT_DISPATCHER
 }
+
+fun NetHttp.setDispatcher(dispatcher: CoroutineDispatcher): FlowNetHttp {
+  return object : FlowNetHttp, NetHttp by this {
+    override fun dispatcher(): CoroutineDispatcher = dispatcher
+  }
+}
