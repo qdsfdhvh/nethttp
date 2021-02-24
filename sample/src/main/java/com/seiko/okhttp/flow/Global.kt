@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.seiko.net.converter.fastjson.FastJsonConverter
 import com.seiko.net.converter.gson.GsonConverter
 import com.seiko.net.converter.moshi.MoshiConverter
+import com.seiko.okhttp.flow.util.createLoggingInterceptor
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY

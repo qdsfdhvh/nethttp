@@ -1,7 +1,8 @@
-package com.seiko.okhttp.flow
+package com.seiko.okhttp.flow.util
 
 import android.content.Context
 import android.os.Environment
+import com.seiko.okhttp.flow.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber

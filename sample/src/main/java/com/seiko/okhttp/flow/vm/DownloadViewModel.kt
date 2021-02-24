@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.seiko.net.download.downloadFlow
 import com.seiko.net.download.downloadRx
-import com.seiko.okhttp.flow.defaultDownloadDir
 import com.seiko.okhttp.flow.http.DownloadNetHttp
+import com.seiko.okhttp.flow.util.defaultDownloadDir
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
