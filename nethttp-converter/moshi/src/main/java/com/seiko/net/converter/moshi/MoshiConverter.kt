@@ -72,18 +72,15 @@ class MoshiConverter private constructor(
 
   companion object {
 
-    @JvmStatic
-    fun create() = create(Moshi.Builder().build())
-
     @JvmOverloads
     @JvmStatic
     fun create(
-      moshi: Moshi,
+      moshi: Moshi = Moshi.Builder().build(),
       lenient: Boolean = false,
       failOnUnknown: Boolean = false,
       serializeNulls: Boolean = false,
     ) = MoshiConverter(
-      moshi,
+      moshi = moshi,
       lenient = lenient,
       failOnUnknown = failOnUnknown,
       serializeNulls = serializeNulls

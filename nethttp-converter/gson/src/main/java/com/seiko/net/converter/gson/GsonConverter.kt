@@ -40,11 +40,9 @@ class GsonConverter private constructor(
 
   companion object {
 
+    @JvmOverloads
     @JvmStatic
-    fun create() = create(Gson())
-
-    @JvmStatic
-    fun create(gson: Gson) = GsonConverter(gson)
+    fun create(gson: Gson = Gson()) = GsonConverter(gson)
 
     private val MEDIA_TYPE = "application/json; charset=UTF-8".toMediaType()
   }
