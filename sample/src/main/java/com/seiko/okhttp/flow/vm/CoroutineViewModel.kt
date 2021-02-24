@@ -9,10 +9,7 @@ import com.seiko.net.param.get
 import com.seiko.net.param.postForm
 import com.seiko.net.param.postJson
 import com.seiko.okhttp.flow.Global
-import com.seiko.okhttp.flow.http.GsonNetHttp
-import com.seiko.okhttp.flow.http.MyFlowNetHttp
-import com.seiko.okhttp.flow.http.Response
-import com.seiko.okhttp.flow.http.asFlowResponse
+import com.seiko.okhttp.flow.http.*
 import com.seiko.okhttp.flow.model.Location
 import com.seiko.okhttp.flow.model.Name
 import com.seiko.okhttp.flow.model.response.BannerResponse
@@ -56,18 +53,10 @@ class CoroutineViewModel : ViewModel() {
       .postJson("/banner/json")
       .add("name", "张三")
       .add("sex", 1)
-      //.addAll("{\"height\":180,\"weight\":70}")
-      .addAll(mapOf("height" to 180, "weight" to 70))
+      .addJsonObject("{\"height\":180,\"weight\":70}")
       .add("interest", listOf("羽毛球", "游泳")) //添加数组对象
       .add("location", Location(120.6788, 30.7866))  //添加位置对象
-      //.addJsonElement("address", "{\"street\":\"科技园路.\",\"city\":\"江苏苏州\",\"country\":\"中国\"}")
-      .add(
-        "address", mapOf(
-          "street" to "科技园路",
-          "city" to "江苏苏州",
-          "country" to "中国",
-        )
-      )
+      .addJsonElement("address", "{\"street\":\"科技园路.\",\"city\":\"江苏苏州\",\"country\":\"中国\"}")
       .asFlowResponse<List<BannerResponse>>()
       .map { it[0].toString() }
       .catch { Timber.w(it) }

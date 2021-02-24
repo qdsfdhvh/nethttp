@@ -13,7 +13,7 @@ class PostJsonParamNetHttp internal constructor(
 
   // body = selfBody ?: mapBody
   private var selfBody: Any? = null
-  private val mapBody = hashMapOf<String, Any>()
+  private val mapBody = hashMapOf<String, Any?>()
 
   fun body(body: Any?) = apply {
     selfBody = body
@@ -23,7 +23,7 @@ class PostJsonParamNetHttp internal constructor(
     mapBody[key] = value
   }
 
-  fun addAll(map: Map<String, Any>) = apply {
+  fun addAll(map: Map<String, Any?>) = apply {
     mapBody.putAll(map)
   }
 
