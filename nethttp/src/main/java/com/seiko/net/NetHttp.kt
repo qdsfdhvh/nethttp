@@ -27,6 +27,7 @@ interface NetHttp {
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var converter: Converter
 
+    @JvmStatic
     fun init(okHttpClient: OkHttpClient, converter: Converter) {
       this.okHttpClient = okHttpClient
       this.converter = converter

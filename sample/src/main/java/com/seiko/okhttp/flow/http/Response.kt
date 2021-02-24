@@ -43,8 +43,11 @@ class ResponseParser<T>(
   }
 }
 
+fun <T : Any> NetHttp.Call.toResponse(type: Type): T =
+  useParse(ResponseParser(this, type))
+
 inline fun <reified T : Any> NetHttp.Call.toResponse(): T =
-  useParse(ResponseParser(this, object : TypeLiteral<T>() {}.type))
+  toResponse(object : TypeLiteral<T>() {}.type)
 
 inline fun <reified T : Any> NetHttp.Call.asFlowResponse(): Flow<T> =
   flow { emit(toResponse<T>()) }.flowOn(dispatcher())
