@@ -67,6 +67,7 @@ dependencies {
     implementation project(':nethttp')
     implementation project(':nethttp-converter:moshi')
     implementation project(':nethttp-converter:gson')
+    implementation project(':nethttp-converter:fastjson')
 //    implementation project(':nethttp-converter:kotlinx')
     implementation project(':nethttp-download:flow')
     implementation project(':nethttp-download:rx')

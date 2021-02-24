@@ -2,7 +2,6 @@ package com.seiko.okhttp.flow
 
 import android.app.Application
 import com.seiko.net.NetHttp
-import com.seiko.net.converter.moshi.MoshiConverter
 import timber.log.Timber
 
 class App : Application() {
@@ -12,8 +11,7 @@ class App : Application() {
 
     Timber.plant(Timber.DebugTree())
 
-    NetHttp.init(Global.okHttpClient, MoshiConverter.create(Global.moshi))
+    NetHttp.init(Global.okHttpClient, Global.moshiConverter)
     NetHttp.baseUrl = "https://www.wanandroid.com/"
   }
-
 }
