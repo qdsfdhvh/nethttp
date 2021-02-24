@@ -29,7 +29,7 @@ class CoroutineViewModel : ViewModel() {
 
   fun sendGet() {
     FlowNetHttp
-      .get("/article/list/0/json")
+      .get("article/list/0/json")
       .asFlow<Response<Page<ListResponse>>>()
       .map { it.data!!.datas[0].toString() }
       .catch { Timber.w(it) }
@@ -39,7 +39,7 @@ class CoroutineViewModel : ViewModel() {
 
   fun sendPostForm() {
     FlowNetHttp
-      .postForm("/article/query/0/json")
+      .postForm("article/query/0/json")
       .add("k", "性能优化")
       .asFlowResponse<Page<ListResponse>>()
       .map { it.datas[1].toString() }
@@ -50,7 +50,7 @@ class CoroutineViewModel : ViewModel() {
 
   fun sendPostJson() {
     MyFlowNetHttp
-      .postJson("/banner/json")
+      .postJson("banner/json")
       .add("name", "张三")
       .add("sex", 1)
       .addJsonObject("{\"height\":180,\"weight\":70}")
@@ -66,7 +66,7 @@ class CoroutineViewModel : ViewModel() {
 
   fun sendPostJsonArray() {
     GsonNetHttp
-      .postJson("/banner/json")
+      .postJson("banner/json")
       .body(
         listOf(
           Name("赵六"),
@@ -85,7 +85,7 @@ class CoroutineViewModel : ViewModel() {
     NetHttp
       .setConverter(Global.fastJsonConverter)
       .setDispatcher(Dispatchers.Default)
-      .get("/banner/json")
+      .get("banner/json")
       .asFlowResponse<List<BannerResponse>>()
       .map { it[2].toString() }
       .catch { Timber.w(it) }
