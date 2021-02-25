@@ -1,0 +1,13 @@
+apply plugin: 'com.github.panpf.bintray-publish'
+
+publish {
+    userOrg = POM_DEVELOPER_ID
+    groupId = GROUP
+    artifactId = POM_ARTIFACT_ID
+    uploadName = POM_PACKAGE_NAME
+    publishVersion = VERSION_NAME
+    desc = POM_DESCRIPTION
+    website = POM_SCM_URL
+    licences = ['Apache-2.0']
+    dryRun = false
+}
