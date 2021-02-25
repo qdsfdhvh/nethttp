@@ -37,10 +37,12 @@ NetHttp.baseUrl = "https://.../"
 ```kotlin
 // rx
 NetHttp
-  .get("get/path") {
-      add('k', 'v')
+  .get("get/path") { 
+    addQuery('k', 'v') 
+    addHeader('k', 'v')
   }
-  .add('k', 'v') // or here
+  .addQuery('k', 'v') // or here
+  .addHeader('k', 'v')
   .asSingle<Response<Page<ListResponse>>>()
   .map { it.toString() }
   .observeOn(AndroidSchedulers.mainThread())
