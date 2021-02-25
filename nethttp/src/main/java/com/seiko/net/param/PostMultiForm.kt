@@ -7,7 +7,6 @@ import com.seiko.net.util.addParts
 import com.seiko.net.util.asRequestBody
 import com.seiko.net.util.getMediaType
 import okhttp3.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MultipartBody.Part
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -211,7 +210,7 @@ class PostMultiFormParamNetHttp internal constructor(
 
   override fun buildRequest(): Request {
     return Request.Builder()
-      .url(wrapperUrl(url).toHttpUrl())
+      .url(buildHttpUrl(url))
       .post(bodyBuilder.build())
       .headers(buildHeaders())
       .build()

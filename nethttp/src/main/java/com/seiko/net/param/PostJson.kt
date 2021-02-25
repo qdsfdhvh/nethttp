@@ -2,7 +2,6 @@ package com.seiko.net.param
 
 import com.seiko.net.NetHttp
 import com.seiko.net.util.convert
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 
 class PostJsonBody {
@@ -48,7 +47,7 @@ class PostJsonParamNetHttp internal constructor(
 
   override fun buildRequest(): Request {
     return Request.Builder()
-      .url(wrapperUrl(url).toHttpUrl())
+      .url(buildHttpUrl(url))
       .post(converter().convert(bodyBuilder.build()))
       .headers(buildHeaders())
       .build()

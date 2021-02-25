@@ -1,7 +1,6 @@
 package com.seiko.net.param
 
 import com.seiko.net.NetHttp
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 
 class HeadParamNetHttp internal constructor(
@@ -10,7 +9,7 @@ class HeadParamNetHttp internal constructor(
 ) : AbsHeaderParamNetHttp<HeadParamNetHttp>(netHttp) {
   override fun buildRequest(): Request {
     return Request.Builder()
-      .url(wrapperUrl(url).toHttpUrl())
+      .url(buildHttpUrl(url))
       .head()
       .headers(buildHeaders())
       .build()

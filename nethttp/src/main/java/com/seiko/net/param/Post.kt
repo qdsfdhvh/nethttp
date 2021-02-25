@@ -1,7 +1,6 @@
 package com.seiko.net.param
 
 import com.seiko.net.NetHttp
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -17,9 +16,8 @@ class PostParamNetHttp internal constructor(
   }
 
   override fun buildRequest(): Request {
-    val httpUrl = wrapperUrl(url).toHttpUrl()
     return Request.Builder()
-      .url(httpUrl)
+      .url(buildHttpUrl(url))
       .post(bodyBinder?.invoke() ?: byteArrayOf().toRequestBody())
       .headers(buildHeaders())
       .build()

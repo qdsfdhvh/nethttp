@@ -4,7 +4,6 @@ import com.seiko.net.NetHttp
 import com.seiko.net.model.KeyValue
 import com.seiko.net.util.addParams
 import okhttp3.FormBody
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 
 class PostFormBody {
@@ -43,7 +42,7 @@ class PostFormParamNetHttp internal constructor(
 
   override fun buildRequest(): Request {
     return Request.Builder()
-      .url(wrapperUrl(url).toHttpUrl())
+      .url(buildHttpUrl(url))
       .post(bodyBuilder.build())
       .headers(buildHeaders())
       .build()
