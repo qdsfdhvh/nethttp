@@ -4,9 +4,6 @@ import com.seiko.net.NetHttp
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 
-fun NetHttp.head(url: String) =
-  HeadParamNetHttp(this, url)
-
 class HeadParamNetHttp internal constructor(
   netHttp: NetHttp,
   private val url: String,
@@ -18,4 +15,8 @@ class HeadParamNetHttp internal constructor(
       .headers(buildHeaders())
       .build()
   }
+}
+
+fun NetHttp.head(url: String): HeadParamNetHttp {
+  return HeadParamNetHttp(this, url)
 }

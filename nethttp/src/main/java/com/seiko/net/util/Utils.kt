@@ -1,6 +1,7 @@
 package com.seiko.net.util
 
 import com.seiko.net.Converter
+import okhttp3.RequestBody
 import okhttp3.Response
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -13,6 +14,10 @@ open class TypeLiteral<T> {
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun <T> Converter.convert(response: Response, type: Type): T {
   return convert(response.throwIfFatal(), type)
+}
+
+inline fun <reified T> Converter.convert(value: T): RequestBody {
+  return convert(value, T::class.java)
 }
 
 /**

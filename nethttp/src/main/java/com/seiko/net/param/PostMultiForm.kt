@@ -13,23 +13,81 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
-fun NetHttp.postMultiForm(url: String) = PostMultiFormParamNetHttp(this, url)
-
-class PostMultiFormParamNetHttp internal constructor(
-  netHttp: NetHttp,
-  private val url: String,
-) : AbsHeaderParamNetHttp<PostFormParamNetHttp>(netHttp) {
-
+class PostMultiFormBody {
   private var mediaType: MediaType? = null
   private val parts = mutableListOf<Part>()
 
-  fun setMultiForm() = apply { mediaType = MultipartBody.FORM }
-  fun setMultiMixed() = apply { mediaType = MultipartBody.MIXED }
-  fun setMultiAlternative() = apply { mediaType = MultipartBody.ALTERNATIVE }
-  fun setMultiDigest() = apply { mediaType = MultipartBody.DIGEST }
-  fun setMultiParallel() = apply { mediaType = MultipartBody.PARALLEL }
+  fun setMultiForm() {
+    mediaType = MultipartBody.FORM
+  }
 
-  fun addUri(context: Context, uri: Uri, contentType: MediaType? = null) = run {
+  fun setMultiMixed() {
+    mediaType = MultipartBody.MIXED
+  }
+
+  fun setMultiAlternative() {
+    mediaType = MultipartBody.ALTERNATIVE
+  }
+
+  fun setMultiDigest() {
+    mediaType = MultipartBody.DIGEST
+  }
+
+  fun setMultiParallel() {
+    mediaType = MultipartBody.PARALLEL
+  }
+
+  fun addPart(part: Part) {
+    parts.add(part)
+  }
+
+  fun addPart(requestBody: RequestBody, headers: Headers? = null) {
+    addPart(Part.create(headers, requestBody))
+  }
+
+  fun addPart(contentType: MediaType, content: ByteArray) {
+    addPart(content.toRequestBody(contentType))
+  }
+
+  fun addPart(contentType: MediaType, content: ByteArray, offset: Int, byteCount: Int) {
+    addPart(content.toRequestBody(contentType, offset, byteCount))
+  }
+
+  fun addFormDataPart(name: String, value: String) {
+    addPart(Part.createFormData(name, value))
+  }
+
+  fun addFormDataPart(name: String, fileName: String, body: RequestBody) {
+    addPart(Part.createFormData(name, fileName, body))
+  }
+
+  fun addFile(key: String, filePath: String, fileName: String? = null) {
+    addFile(key, File(filePath), fileName)
+  }
+
+  fun addFile(key: String, file: File, fileName: String? = null) {
+    val name = fileName ?: file.name
+    val body = file.asRequestBody(name.getMediaType())
+    addPart(Part.createFormData(key, name, body))
+  }
+
+  fun addFiles(key: String, fileList: List<File>) {
+    fileList.forEach { addFile(key, it) }
+  }
+
+  fun addFiles(fileMap: Map<String, File>) {
+    fileMap.forEach { addFile(it.key, it.value) }
+  }
+
+  fun addFilePaths(key: String, fileList: List<String>) {
+    fileList.forEach { addFile(key, it) }
+  }
+
+  fun addFilePaths(fileMap: Map<String, String>) {
+    fileMap.forEach { addFile(it.key, it.value) }
+  }
+
+  fun addUri(context: Context, uri: Uri, contentType: MediaType? = null) {
     addPart(uri.asRequestBody(context, contentType))
   }
 
@@ -39,77 +97,130 @@ class PostMultiFormParamNetHttp internal constructor(
     uri: Uri,
     fileName: String? = null,
     contentType: MediaType? = null,
-  ) = run {
+  ) {
     val body = uri.asRequestBody(context, contentType)
     val part = Part.createFormData(key, fileName, body)
     addPart(part)
   }
 
-  fun addFile(key: String, filePath: String) =
-    addFile(key, File(filePath))
-
-  fun addFile(key: String, filePath: String, fileName: String) =
-    addFile(key, File(filePath), fileName)
-
-  @JvmOverloads
-  fun addFile(key: String, file: File, fileName: String = file.name) = run {
-    val body = file.asRequestBody(fileName.getMediaType())
-    addPart(Part.createFormData(key, fileName, body))
-  }
-
-  fun addFiles(key: String, fileList: List<File>) = apply {
-    fileList.forEach { addFile(key, it) }
-  }
-
-  fun addFiles(fileMap: Map<String, File>) = apply {
-    fileMap.forEach { addFile(it.key, it.value) }
-  }
-
-  fun addFilePaths(key: String, fileList: List<String>) = apply {
-    fileList.forEach { addFile(key, it) }
-  }
-
-  fun addFilePaths(fileMap: Map<String, String>) = apply {
-    fileMap.forEach { addFile(it.key, it.value) }
-  }
-
-  fun addPart(contentType: MediaType, content: ByteArray) =
-    addPart(content.toRequestBody(contentType))
-
-  fun addPart(contentType: MediaType, content: ByteArray, offset: Int, byteCount: Int) =
-    addPart(content.toRequestBody(contentType, offset, byteCount))
-
-  @JvmOverloads
-  fun addPart(requestBody: RequestBody, headers: Headers? = null) =
-    addPart(Part.create(headers, requestBody))
-
-  fun addFormDataPart(name: String, value: String) =
-    addPart(Part.createFormData(name, value))
-
-  fun addFormDataPart(name: String, fileName: String, body: RequestBody) =
-    addPart(Part.createFormData(name, fileName, body))
-
-  fun addPart(part: Part) = apply {
-    parts.add(part)
-  }
-
-  override fun buildRequest(): Request {
-    val httpUrl = wrapperUrl(url).toHttpUrl()
-    val bodyBuilder = MultipartBody.Builder()
+  internal fun build(): RequestBody {
+    val builder = MultipartBody.Builder()
     if (parts.isNotEmpty()) {
-      bodyBuilder.addParts(parts)
+      builder.addParts(parts)
       if (mediaType == null) {
         mediaType = MultipartBody.FORM
       }
     }
     val mediaType = mediaType
     if (mediaType != null) {
-      bodyBuilder.setType(mediaType)
+      builder.setType(mediaType)
     }
+    return builder.build()
+  }
+}
+
+class PostMultiFormParamNetHttp internal constructor(
+  netHttp: NetHttp,
+  private val url: String,
+  body: PostMultiFormBody.() -> Unit,
+) : AbsHeaderParamNetHttp<PostFormParamNetHttp>(netHttp) {
+
+  private val bodyBuilder = PostMultiFormBody().apply(body)
+
+  fun setMultiForm() = apply {
+    bodyBuilder.setMultiForm()
+  }
+
+  fun setMultiMixed() = apply {
+    bodyBuilder.setMultiMixed()
+  }
+
+  fun setMultiAlternative() = apply {
+    bodyBuilder.setMultiAlternative()
+  }
+
+  fun setMultiDigest() = apply {
+    bodyBuilder.setMultiDigest()
+  }
+
+  fun setMultiParallel() = apply {
+    bodyBuilder.setMultiParallel()
+  }
+
+  fun addPart(part: Part) = apply {
+    bodyBuilder.addPart(part)
+  }
+
+  fun addPart(requestBody: RequestBody, headers: Headers? = null) = apply {
+    bodyBuilder.addPart(requestBody, headers)
+  }
+
+  fun addPart(contentType: MediaType, content: ByteArray) = apply {
+    bodyBuilder.addPart(contentType, content)
+  }
+
+  fun addPart(contentType: MediaType, content: ByteArray, offset: Int, byteCount: Int) = apply {
+    bodyBuilder.addPart(contentType, content, offset, byteCount)
+  }
+
+  fun addFormDataPart(name: String, value: String) = apply {
+    bodyBuilder.addFormDataPart(name, value)
+  }
+
+  fun addFormDataPart(name: String, fileName: String, body: RequestBody) = apply {
+    bodyBuilder.addFormDataPart(name, fileName, body)
+  }
+
+  fun addFile(key: String, filePath: String, fileName: String? = null) = apply {
+    bodyBuilder.addFile(key, filePath, fileName)
+  }
+
+  fun addFile(key: String, file: File, fileName: String? = null) = apply {
+    bodyBuilder.addFile(key, file, fileName)
+  }
+
+  fun addFiles(key: String, fileList: List<File>) = apply {
+    bodyBuilder.addFiles(key, fileList)
+  }
+
+  fun addFiles(fileMap: Map<String, File>) = apply {
+    bodyBuilder.addFiles(fileMap)
+  }
+
+  fun addFilePaths(key: String, fileList: List<String>) = apply {
+    bodyBuilder.addFilePaths(key, fileList)
+  }
+
+  fun addFilePaths(fileMap: Map<String, String>) = apply {
+    bodyBuilder.addFilePaths(fileMap)
+  }
+
+  fun addUri(context: Context, uri: Uri, contentType: MediaType? = null) = apply {
+    bodyBuilder.addUri(context, uri, contentType)
+  }
+
+  fun addUri(
+    context: Context,
+    key: String,
+    uri: Uri,
+    fileName: String? = null,
+    contentType: MediaType? = null,
+  ) = apply {
+    bodyBuilder.addUri(context, key, uri, fileName, contentType)
+  }
+
+  override fun buildRequest(): Request {
     return Request.Builder()
-      .url(httpUrl)
+      .url(wrapperUrl(url).toHttpUrl())
       .post(bodyBuilder.build())
       .headers(buildHeaders())
       .build()
   }
+}
+
+fun NetHttp.postMultiForm(
+  url: String,
+  body: PostMultiFormBody.() -> Unit = {}
+): PostMultiFormParamNetHttp {
+  return PostMultiFormParamNetHttp(this, url, body)
 }

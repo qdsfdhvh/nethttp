@@ -22,7 +22,10 @@ class RxJavaViewModel : BaseRxViewModel() {
 
   fun sendGet() {
     RxNetHttp
-      .get("/article/list/0/json")
+      .get("/article/list/0/json") {
+        add("aa", 111)
+        add("bb", 222)
+      }
       .asSingle<Response<Page<ListResponse>>>()
       .map { it.data!!.datas[0].toString() }
       .observeOn(AndroidSchedulers.mainThread())
@@ -32,8 +35,9 @@ class RxJavaViewModel : BaseRxViewModel() {
 
   fun sendPostForm() {
     RxNetHttp
-      .postForm("/article/query/0/json")
-      .add("k", "性能优化")
+      .postForm("/article/query/0/json") {
+        add("k", "性能优化")
+      }
       .asSingleResponse<Page<ListResponse>>()
       .map { it.datas[1].toString() }
       .observeOn(AndroidSchedulers.mainThread())
@@ -43,13 +47,14 @@ class RxJavaViewModel : BaseRxViewModel() {
 
   fun sendPostJson() {
     MyRxNetHttp
-      .postJson("/banner/json")
-      .add("name", "张三")
-      .add("sex", 1)
-      .addJsonObject("{\"height\":180,\"weight\":70}")
-      .add("interest", listOf("羽毛球", "游泳")) //添加数组对象
-      .add("location", Location(120.6788, 30.7866))  //添加位置对象
-      .addJsonElement("address", "{\"street\":\"科技园路.\",\"city\":\"江苏苏州\",\"country\":\"中国\"}")
+      .postJson("/banner/json") {
+        add("name", "张三")
+        add("sex", 1)
+        addJsonObject("{\"height\":180,\"weight\":70}")
+        add("interest", listOf("羽毛球", "游泳")) //添加数组对象
+        add("location", Location(120.6788, 30.7866))  //添加位置对象
+        addJsonElement("address", "{\"street\":\"科技园路.\",\"city\":\"江苏苏州\",\"country\":\"中国\"}")
+      }
       .asSingleResponse<List<BannerResponse>>()
       .map { it[0].toString() }
       .observeOn(AndroidSchedulers.mainThread())
@@ -59,14 +64,15 @@ class RxJavaViewModel : BaseRxViewModel() {
 
   fun sendPostJsonArray() {
     GsonNetHttp
-      .postJson("/banner/json")
-      .body(
-        listOf(
-          Name("赵六"),
-          Name("杨七"),
-          mapOf("name" to "李四"),
+      .postJson("/banner/json") {
+        body(
+          listOf(
+            Name("赵六"),
+            Name("杨七"),
+            mapOf("name" to "李四"),
+          )
         )
-      )
+      }
       .asSingle<Response<List<BannerResponse>>>()
       .map { it.data!![1].toString() }
       .observeOn(AndroidSchedulers.mainThread())

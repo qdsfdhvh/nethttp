@@ -7,36 +7,52 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 
-fun NetHttp.postForm(url: String) = PostFormParamNetHttp(this, url)
+class PostFormBody {
+  private val params = hashSetOf<KeyValue>()
+
+  fun add(key: String, value: Any, encode: Boolean = false) {
+    params.add(KeyValue(key, value, encode))
+  }
+
+  fun addEncode(key: String, value: Any) {
+    params.add(KeyValue(key, value, true))
+  }
+
+  internal fun build(): FormBody {
+    return FormBody.Builder()
+      .addParams(params)
+      .build()
+  }
+}
 
 class PostFormParamNetHttp internal constructor(
   netHttp: NetHttp,
   private val url: String,
+  body: PostFormBody.() -> Unit = {}
 ) : AbsHeaderParamNetHttp<PostFormParamNetHttp>(netHttp) {
 
-  private val params = hashSetOf<KeyValue>()
+  private val bodyBuilder = PostFormBody().apply(body)
 
-  fun add(key: String, value: Any) = apply {
-    add(key, value, false)
+  fun add(key: String, value: Any, encode: Boolean = false) = apply {
+    bodyBuilder.add(key, value, encode)
   }
 
   fun addEncode(key: String, value: Any) = apply {
-    add(key, value, true)
-  }
-
-  private fun add(key: String, value: Any, encode: Boolean) {
-    params.add(KeyValue(key, value, encode))
+    bodyBuilder.addEncode(key, value)
   }
 
   override fun buildRequest(): Request {
-    val httpUrl = wrapperUrl(url).toHttpUrl()
-    val body = FormBody.Builder()
-      .addParams(params)
-      .build()
     return Request.Builder()
-      .url(httpUrl)
-      .post(body)
+      .url(wrapperUrl(url).toHttpUrl())
+      .post(bodyBuilder.build())
       .headers(buildHeaders())
       .build()
   }
+}
+
+fun NetHttp.postForm(
+  url: String,
+  body: PostFormBody.() -> Unit = {}
+): PostFormParamNetHttp {
+  return PostFormParamNetHttp(this, url, body)
 }
