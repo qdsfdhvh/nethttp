@@ -7,7 +7,7 @@ import okhttp3.Response
 object FlowDownloaderProxy : FlowDownloader {
   override fun download(taskInfo: TaskInfo, response: Response): Flow<Progress> {
     return when {
-      taskInfo.maxConCurrency > 2 && response.isSupportRange() -> RangeFlowDownloader()
+      taskInfo.maxConCurrency > 1 && response.isSupportRange() -> RangeFlowDownloader()
       else -> NormalFlowDownloader()
     }.download(taskInfo, response)
   }
