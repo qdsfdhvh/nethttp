@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,7 +16,6 @@ import com.seiko.okhttp.flow.vm.CoroutineViewModel
 @Composable
 fun CoroutineScene() {
   val viewModel: CoroutineViewModel = viewModel()
-  val body by viewModel.body.observeAsState("")
   Surface(
     modifier = Modifier.fillMaxSize()
   ) {
@@ -33,7 +30,7 @@ fun CoroutineScene() {
         }
       }
       Text(
-        text = body,
+        text = viewModel.body.value,
         modifier = Modifier.padding(6.dp),
       )
     }

@@ -13,7 +13,6 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -41,7 +40,7 @@ class MainActivity : ComponentActivity() {
 private fun MainScene(
   viewModel: MainViewModel
 ) {
-  val currentTab by viewModel.tab.observeAsState(Tabs.RxJava)
+  val currentTab by viewModel.tab
   Column(
     modifier = Modifier.background(Color.White),
   ) {

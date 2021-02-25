@@ -1,8 +1,7 @@
 package com.seiko.okhttp.flow.vm
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.seiko.net.download.downloadFlow
 import com.seiko.net.download.downloadRx
@@ -17,8 +16,7 @@ import timber.log.Timber
 
 class DownloadViewModel : BaseRxViewModel() {
 
-  private val _body = MutableLiveData<String>()
-  val body: LiveData<String> = _body
+  val body = mutableStateOf("")
 
   fun downloadRx(context: Context) {
     DownloadNetHttp
@@ -45,6 +43,6 @@ class DownloadViewModel : BaseRxViewModel() {
   }
 
   private fun showBody(body: String) {
-    _body.value = body
+    this.body.value = body
   }
 }

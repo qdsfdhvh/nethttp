@@ -1,7 +1,6 @@
 package com.seiko.okhttp.flow.vm
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seiko.net.*
@@ -24,8 +23,7 @@ import timber.log.Timber
 
 class CoroutineViewModel : ViewModel() {
 
-  private val _body = MutableLiveData<String>()
-  val body: LiveData<String> = _body
+  val body = mutableStateOf("")
 
   fun sendGet() {
     FlowNetHttp
@@ -94,6 +92,6 @@ class CoroutineViewModel : ViewModel() {
   }
 
   private fun showBody(body: String) {
-    _body.value = body
+    this.body.value = body
   }
 }

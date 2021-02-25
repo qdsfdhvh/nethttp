@@ -1,7 +1,6 @@
 package com.seiko.okhttp.flow.vm
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateOf
 import com.seiko.net.*
 import com.seiko.net.param.get
 import com.seiko.net.param.postForm
@@ -19,8 +18,7 @@ import timber.log.Timber
 
 class RxJavaViewModel : BaseRxViewModel() {
 
-  private val _body = MutableLiveData<String>()
-  val body: LiveData<String> = _body
+  val body = mutableStateOf("")
 
   fun sendGet() {
     RxNetHttp
@@ -89,6 +87,6 @@ class RxJavaViewModel : BaseRxViewModel() {
   }
 
   private fun showBody(body: String) {
-    _body.value = body
+    this.body.value = body
   }
 }
