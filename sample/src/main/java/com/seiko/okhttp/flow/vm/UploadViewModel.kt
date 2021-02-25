@@ -17,6 +17,7 @@ class UploadViewModel : BaseRxViewModel() {
   val showMsg = mutableStateOf("")
   val toastState = mutableStateOf(false)
 
+  // haven't test
   fun upload(context: Context, uri: Uri) {
     DownloadNetHttp.postMultiForm(UPLOAD_URL)
       .addUri(context, "uploaded_file", uri)

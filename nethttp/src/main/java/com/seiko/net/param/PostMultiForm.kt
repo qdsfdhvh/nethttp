@@ -12,7 +12,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
-class PostMultiFormBody {
+class PostMultiFormRequestParams : HeaderRequestParams() {
+
   private var mediaType: MediaType? = null
   private val parts = mutableListOf<Part>()
 
@@ -102,7 +103,7 @@ class PostMultiFormBody {
     addPart(part)
   }
 
-  internal fun build(): RequestBody {
+  internal fun buildBody(): RequestBody {
     val builder = MultipartBody.Builder()
     if (parts.isNotEmpty()) {
       builder.addParts(parts)
@@ -121,81 +122,83 @@ class PostMultiFormBody {
 class PostMultiFormParamNetHttp internal constructor(
   netHttp: NetHttp,
   private val url: String,
-  body: PostMultiFormBody.() -> Unit,
+  paramsBuilder: PostMultiFormRequestParams.() -> Unit,
 ) : AbsHeaderParamNetHttp<PostFormParamNetHttp>(netHttp) {
 
-  private val bodyBuilder = PostMultiFormBody().apply(body)
+  private val params = PostMultiFormRequestParams().apply(paramsBuilder)
+
+  override fun requestParams(): HeaderRequestParams = params
 
   fun setMultiForm() = apply {
-    bodyBuilder.setMultiForm()
+    params.setMultiForm()
   }
 
   fun setMultiMixed() = apply {
-    bodyBuilder.setMultiMixed()
+    params.setMultiMixed()
   }
 
   fun setMultiAlternative() = apply {
-    bodyBuilder.setMultiAlternative()
+    params.setMultiAlternative()
   }
 
   fun setMultiDigest() = apply {
-    bodyBuilder.setMultiDigest()
+    params.setMultiDigest()
   }
 
   fun setMultiParallel() = apply {
-    bodyBuilder.setMultiParallel()
+    params.setMultiParallel()
   }
 
   fun addPart(part: Part) = apply {
-    bodyBuilder.addPart(part)
+    params.addPart(part)
   }
 
   fun addPart(requestBody: RequestBody, headers: Headers? = null) = apply {
-    bodyBuilder.addPart(requestBody, headers)
+    params.addPart(requestBody, headers)
   }
 
   fun addPart(contentType: MediaType, content: ByteArray) = apply {
-    bodyBuilder.addPart(contentType, content)
+    params.addPart(contentType, content)
   }
 
   fun addPart(contentType: MediaType, content: ByteArray, offset: Int, byteCount: Int) = apply {
-    bodyBuilder.addPart(contentType, content, offset, byteCount)
+    params.addPart(contentType, content, offset, byteCount)
   }
 
   fun addFormDataPart(name: String, value: String) = apply {
-    bodyBuilder.addFormDataPart(name, value)
+    params.addFormDataPart(name, value)
   }
 
   fun addFormDataPart(name: String, fileName: String, body: RequestBody) = apply {
-    bodyBuilder.addFormDataPart(name, fileName, body)
+    params.addFormDataPart(name, fileName, body)
   }
 
   fun addFile(key: String, filePath: String, fileName: String? = null) = apply {
-    bodyBuilder.addFile(key, filePath, fileName)
+    params.addFile(key, filePath, fileName)
   }
 
   fun addFile(key: String, file: File, fileName: String? = null) = apply {
-    bodyBuilder.addFile(key, file, fileName)
+    params.addFile(key, file, fileName)
   }
 
   fun addFiles(key: String, fileList: List<File>) = apply {
-    bodyBuilder.addFiles(key, fileList)
+    params.addFiles(key, fileList)
   }
 
   fun addFiles(fileMap: Map<String, File>) = apply {
-    bodyBuilder.addFiles(fileMap)
+    params.addFiles(fileMap)
   }
 
   fun addFilePaths(key: String, fileList: List<String>) = apply {
-    bodyBuilder.addFilePaths(key, fileList)
+    params.addFilePaths(key, fileList)
   }
 
   fun addFilePaths(fileMap: Map<String, String>) = apply {
-    bodyBuilder.addFilePaths(fileMap)
+    params.addFilePaths(fileMap)
   }
 
   fun addUri(context: Context, uri: Uri, contentType: MediaType? = null) = apply {
-    bodyBuilder.addUri(context, uri, contentType)
+    params.addUri(context, uri, contentType)
   }
 
   fun addUri(
@@ -205,13 +208,13 @@ class PostMultiFormParamNetHttp internal constructor(
     fileName: String? = null,
     contentType: MediaType? = null,
   ) = apply {
-    bodyBuilder.addUri(context, key, uri, fileName, contentType)
+    params.addUri(context, key, uri, fileName, contentType)
   }
 
   override fun buildRequest(): Request {
     return Request.Builder()
       .url(buildHttpUrl(url))
-      .post(bodyBuilder.build())
+      .post(params.buildBody())
       .headers(buildHeaders())
       .build()
   }
@@ -219,7 +222,7 @@ class PostMultiFormParamNetHttp internal constructor(
 
 fun NetHttp.postMultiForm(
   url: String,
-  body: PostMultiFormBody.() -> Unit = {}
+  paramsBuilder: PostMultiFormRequestParams.() -> Unit = {}
 ): PostMultiFormParamNetHttp {
-  return PostMultiFormParamNetHttp(this, url, body)
+  return PostMultiFormParamNetHttp(this, url, paramsBuilder)
 }

@@ -23,67 +23,109 @@ abstract class AbsParamNetHttp(netHttp: NetHttp) : ParamNetHttp, NetHttp by netH
 abstract class AbsHeaderParamNetHttp<out T : AbsParamNetHttp>(netHttp: NetHttp) :
   AbsParamNetHttp(netHttp) {
 
-  private val params = hashSetOf<KeyValue>()
-  private val headersBuilder = Headers.Builder()
-
   fun addQuery(key: String, value: Any, encode: Boolean = false): T {
-    params.add(KeyValue(key, value, encode))
+    requestParams().addQuery(key, value, encode)
     return this as T
   }
 
   fun addEncodedQuery(key: String, value: Any): T {
-    params.add(KeyValue(key, value, true))
+    requestParams().addEncodedQuery(key, value)
     return this as T
   }
 
   fun addHeader(name: String, value: Date): T {
-    headersBuilder.add(name, value)
+    requestParams().addHeader(name, value)
     return this as T
   }
 
   fun addHeader(name: String, value: Instant): T {
-    headersBuilder.add(name, value)
+    requestParams().addHeader(name, value)
     return this as T
   }
 
   fun addHeader(name: String, value: String): T {
-    headersBuilder.add(name, value)
+    requestParams().addHeader(name, value)
     return this as T
   }
 
   fun addHeaders(headers: Map<String, String>): T {
-    headers.forEach { entry ->
-      headersBuilder.add(entry.key, entry.value)
-    }
+    requestParams().addHeaders(headers)
     return this as T
   }
 
   fun header(name: String, value: Date): T {
-    headersBuilder[name] = value
+    requestParams().header(name, value)
     return this as T
   }
 
   fun header(name: String, value: Instant): T {
-    headersBuilder[name] = value
+    requestParams().header(name, value)
     return this as T
   }
 
   fun header(name: String, value: String): T {
-    headersBuilder[name] = value
+    requestParams().header(name, value)
     return this as T
   }
 
+  abstract fun requestParams(): HeaderRequestParams
+
   protected open fun buildHttpUrl(url: String): HttpUrl {
     var httpUrl = wrapperUrl(url).toHttpUrl()
-    if (params.isNotEmpty()) {
+    val queryParams = requestParams().queryParams
+    if (queryParams.isNotEmpty()) {
       httpUrl = httpUrl.newBuilder()
-        .addQueryParameters(params)
+        .addQueryParameters(queryParams)
         .build()
     }
     return httpUrl
   }
 
   protected open fun buildHeaders(): Headers {
-    return headersBuilder.build()
+    return requestParams().headersBuilder.build()
+  }
+}
+
+open class HeaderRequestParams {
+
+  internal val queryParams = hashSetOf<KeyValue>()
+  internal val headersBuilder = Headers.Builder()
+
+  fun addQuery(key: String, value: Any, encode: Boolean = false) {
+    queryParams.add(KeyValue(key, value, encode))
+  }
+
+  fun addEncodedQuery(key: String, value: Any) {
+    queryParams.add(KeyValue(key, value, true))
+  }
+
+  fun addHeader(name: String, value: Date) {
+    headersBuilder.add(name, value)
+  }
+
+  fun addHeader(name: String, value: Instant) {
+    headersBuilder.add(name, value)
+  }
+
+  fun addHeader(name: String, value: String) {
+    headersBuilder.add(name, value)
+  }
+
+  fun addHeaders(headers: Map<String, String>) {
+    headers.forEach { entry ->
+      headersBuilder.add(entry.key, entry.value)
+    }
+  }
+
+  fun header(name: String, value: Date) {
+    headersBuilder[name] = value
+  }
+
+  fun header(name: String, value: Instant) {
+    headersBuilder[name] = value
+  }
+
+  fun header(name: String, value: String) {
+    headersBuilder[name] = value
   }
 }

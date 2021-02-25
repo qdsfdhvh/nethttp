@@ -22,13 +22,16 @@ class RxJavaViewModel : BaseRxViewModel() {
 
   fun sendGet() {
     RxNetHttp
-      .get("/article/list/0/json")
-      .addQuery("aa", 111)
-      .addEncodedQuery("bb", "asddaas::")
-      .addHeader("header1", "value1")
-      .addHeader("header1", "value2")
-      .header("header2", "value21")
-      .header("header2", "value22")
+      .get("/article/list/0/json") {
+        addQuery("key11", 111)
+        addEncodedQuery("key11", "ccc")
+        addHeader("test_header_01", "value1")
+        header("test_header_02", "value1")
+      }
+      .addQuery("key22", 111)
+      .addEncodedQuery("key22", "asddaas")
+      .addHeader("test_header_01", "value2")
+      .header("test_header_02", "value2")
       .asSingle<Response<Page<ListResponse>>>()
       .map { it.data!!.datas[0].toString() }
       .observeOn(AndroidSchedulers.mainThread())

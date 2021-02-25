@@ -4,7 +4,7 @@ import com.seiko.net.NetHttp
 import com.seiko.net.util.convert
 import okhttp3.Request
 
-class PostJsonBody {
+class PostJsonRequestParams : HeaderRequestParams() {
 
   // body = selfBody ?: mapBody
   private var selfBody: Any? = null
@@ -22,33 +22,35 @@ class PostJsonBody {
     mapBody.putAll(map)
   }
 
-  internal fun build() = selfBody ?: mapBody
+  internal fun buildBody() = selfBody ?: mapBody
 }
 
 class PostJsonParamNetHttp internal constructor(
   netHttp: NetHttp,
   private val url: String,
-  body: PostJsonBody.() -> Unit
+  paramsBuilder: PostJsonRequestParams.() -> Unit
 ) : AbsHeaderParamNetHttp<PostJsonParamNetHttp>(netHttp) {
 
-  private val bodyBuilder = PostJsonBody().apply(body)
+  private val params = PostJsonRequestParams().apply(paramsBuilder)
+
+  override fun requestParams(): HeaderRequestParams = params
 
   fun body(body: Any?) = apply {
-    bodyBuilder.body(body)
+    params.body(body)
   }
 
   fun add(key: String, value: Any) = apply {
-    bodyBuilder.add(key, value)
+    params.add(key, value)
   }
 
   fun addAll(map: Map<String, Any?>) = apply {
-    bodyBuilder.addAll(map)
+    params.addAll(map)
   }
 
   override fun buildRequest(): Request {
     return Request.Builder()
       .url(buildHttpUrl(url))
-      .post(converter().convert(bodyBuilder.build()))
+      .post(converter().convert(params.buildBody()))
       .headers(buildHeaders())
       .build()
   }
@@ -56,7 +58,7 @@ class PostJsonParamNetHttp internal constructor(
 
 fun NetHttp.postJson(
   url: String,
-  body: PostJsonBody.() -> Unit = {}
+  paramsBuilder: PostJsonRequestParams.() -> Unit = {}
 ): PostJsonParamNetHttp {
-  return PostJsonParamNetHttp(this, url, body)
+  return PostJsonParamNetHttp(this, url, paramsBuilder)
 }
