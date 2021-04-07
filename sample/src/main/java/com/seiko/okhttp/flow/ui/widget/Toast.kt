@@ -1,9 +1,6 @@
 package com.seiko.okhttp.flow.ui.widget
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -48,7 +45,7 @@ fun Toast(
       contentAlignment = Alignment.BottomCenter
     ) {
       Surface(
-        modifier = Modifier.preferredSize(200.dp, 60.dp),
+        modifier = Modifier.size(200.dp, 60.dp),
         color = ToastBackground,
         shape = RoundedCornerShape(4.dp)
       ) {
