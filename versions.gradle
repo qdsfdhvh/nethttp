@@ -1,7 +1,8 @@
 ext {
     versions = [
-            kotlin                : "1.4.31",
-            ksp                   : "1.4.31-1.0.0-alpha06",
+            kotlin                : "1.5.10",
+            ksp                   : "1.5.10-1.0.0-beta01",
+
             compose               : '1.0.0-beta03',
             androidx              : '1.3.0-alpha05',
             annotation            : '1.1.0',
@@ -12,8 +13,9 @@ ext {
             rxjava3               : '3.0.6',
             rxandroid3            : '3.0.0',
             timber                : '4.7.1',
+
             moshi                 : '1.11.0',
-            moshi_ksp             : '0.9.1',
+            moshi_ksp             : '0.11.2',
             gson                  : '2.8.6',
             fastjson              : '1.2.75',
             kotlinx_serialization : '1.0.1',
