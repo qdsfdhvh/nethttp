@@ -1,13 +1,30 @@
-apply plugin: 'com.github.panpf.bintray-publish'
+apply plugin: 'maven-publish'
 
-publish {
-    userOrg = POM_DEVELOPER_ID
-    groupId = GROUP
-    artifactId = POM_ARTIFACT_ID
-    uploadName = POM_PACKAGE_NAME
-    publishVersion = VERSION_NAME
-    desc = POM_DESCRIPTION
-    website = POM_SCM_URL
-    licences = ['Apache-2.0']
-    dryRun = false
+afterEvaluate {
+    publishing {
+        if (project.plugins.hasPlugin('kotlin-android')) {
+            publications {
+                release(MavenPublication) {
+                    from components.release
+                    groupId = GROUP
+                    artifactId = POM_ARTIFACT_ID
+                    version = VERSION_NAME
+                }
+            }
+        } else {
+            java {
+                withJavadocJar()
+                withSourcesJar()
+            }
+
+            publications {
+                maven(MavenPublication) {
+                    from components.java
+                    groupId = GROUP
+                    artifactId = POM_ARTIFACT_ID
+                    version = VERSION_NAME
+                }
+            }
+        }
+    }
 }
