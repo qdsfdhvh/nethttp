@@ -66,12 +66,12 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
     implementation "io.reactivex.rxjava3:rxandroid:$versions.rxandroid3"
 
-    implementation project(':nethttp')
-    implementation project(':nethttp-converter:moshi')
-    implementation project(':nethttp-converter:gson')
-    implementation project(':nethttp-converter:fastjson')
-    implementation project(':nethttp-download:flow')
-    implementation project(':nethttp-download:rx')
+    implementation project(':core')
+    implementation project(':converter-moshi')
+    implementation project(':converter-gson')
+    implementation project(':converter-fastjson')
+    implementation project(':download-flow')
+    implementation project(':download-rx')
 
     ksp "dev.zacsweers.moshix:moshi-ksp:$versions.moshi_ksp"
 

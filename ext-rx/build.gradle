@@ -2,8 +2,8 @@ apply plugin: 'kotlin'
 apply plugin: 'java-library'
 
 dependencies {
-    api project(':nethttp')
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
+    api project(':core')
+    api "io.reactivex.rxjava3:rxjava:$versions.rxjava3"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
