@@ -1,21 +1,19 @@
 apply plugin: 'maven-publish'
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 afterEvaluate {
-
-    task sourcejar (type: Jar) {
-        from "src/main/java"
-        classifier "sources"
-    }
-
     publishing {
         publications {
-            maven (MavenPublication) {
-                artifact jar
-                artifact sourcejar
-
-                groupId = GROUP
+            mavenJava(MavenPublication) {
                 artifactId = POM_ARTIFACT_ID
-                version = VERSION_NAME
+                from components.java
+
+                groupId = POM_ARTIFACT_GROUP
+                version = POM_ARTIFACT_VERSION
             }
         }
     }
