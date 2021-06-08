@@ -56,8 +56,8 @@ dependencies {
     // see https://stackoverflow.com/questions/67611497/java-lang-nosuchmethoderror-after-upgrading-jetpack-compose-to-1-0-0-beta07
     implementation "androidx.navigation:navigation-compose:2.4.0-alpha01"
 
-    implementation "androidx.activity:activity-ktx:$versions.androidx"
-    implementation "androidx.activity:activity-compose:$versions.androidx"
+    implementation "androidx.activity:activity-ktx:$versions.activity"
+    implementation "androidx.activity:activity-compose:$versions.activity"
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.lifecycle_compose"
