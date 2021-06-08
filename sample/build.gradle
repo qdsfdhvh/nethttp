@@ -54,7 +54,7 @@ dependencies {
 
     // Throw: No interface method startReplaceableGroup(ILjava/lang/String;)
     // see https://stackoverflow.com/questions/67611497/java-lang-nosuchmethoderror-after-upgrading-jetpack-compose-to-1-0-0-beta07
-    implementation "androidx.navigation:navigation-compose:2.4.0-alpha01"
+    implementation "androidx.navigation:navigation-compose:2.4.0-alpha02"
 
     implementation "androidx.activity:activity-ktx:$versions.activity"
     implementation "androidx.activity:activity-compose:$versions.activity"
