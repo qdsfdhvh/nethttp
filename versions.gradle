@@ -15,7 +15,7 @@ ext {
             rxandroid3            : '3.0.0',
             timber                : '4.7.1',
 
-            moshi                 : '1.11.0',
+            moshi                 : '1.12.0',
             moshi_ksp             : '0.11.2',
             gson                  : '2.8.6',
             fastjson              : '1.2.75',
