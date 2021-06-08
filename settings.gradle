@@ -1,5 +1,5 @@
 rootProject.name = "NetHttp"
-include ':sample'
+include ':app'
 include ':nethttp'
 include ':nethttp-converter:fastjson'
 include ':nethttp-converter:gson'
