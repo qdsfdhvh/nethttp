@@ -1,29 +1,21 @@
 apply plugin: 'maven-publish'
 
 afterEvaluate {
-    publishing {
-        if (project.plugins.hasPlugin('kotlin-android')) {
-            publications {
-                release(MavenPublication) {
-                    from components.release
-                    groupId = GROUP
-                    artifactId = POM_ARTIFACT_ID
-                    version = VERSION_NAME
-                }
-            }
-        } else {
-            java {
-                withJavadocJar()
-                withSourcesJar()
-            }
 
-            publications {
-                maven(MavenPublication) {
-                    from components.java
-                    groupId = GROUP
-                    artifactId = POM_ARTIFACT_ID
-                    version = VERSION_NAME
-                }
+    task sourcejar (type: Jar) {
+        from "src/main/java"
+        classifier "sources"
+    }
+
+    publishing {
+        publications {
+            maven (MavenPublication) {
+                artifact jar
+                artifact sourcejar
+
+                groupId = GROUP
+                artifactId = POM_ARTIFACT_ID
+                version = VERSION_NAME
             }
         }
     }
