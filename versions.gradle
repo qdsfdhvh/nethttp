@@ -9,7 +9,7 @@ ext {
             lifecycle             : '2.4.0-alpha01',
             lifecycle_compose     : '1.0.0-alpha04',
 
-            okhttp                : '4.9.0',
+            okhttp                : '4.9.1',
             coroutines            : '1.4.2',
             rxjava3               : '3.0.6',
             rxandroid3            : '3.0.0',
