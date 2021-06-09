@@ -1,6 +1,6 @@
 # okhttp-flow
 
-[![version](https://api.bintray.com/packages/qdsfdhvh/maven/NetHttp/images/download.svg)](https://bintray.com/qdsfdhvh/maven/NetHttp)
+[![](https://jitpack.io/v/qdsfdhvh/nethttp.svg)](https://jitpack.io/#qdsfdhvh/nethttp)
 
 参照[okhttp-RxHttp](https://github.com/liujingxing/okhttp-RxHttp)、[RxDownload](https://github.com/ssseasonnn/RxDownload)，按个人使用习惯编写的库，building...
 
@@ -9,19 +9,23 @@
 in `build.gradle`:
 
 ```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
-    def netHttpVersion = '1.0.0'
-    implementation "com.seiko.net:nethttp:$netHttpVersion"
+    def netHttpVersion = '1.0.4'
+    implementation "com.github.qdsfdhvh.nethttp:core:$netHttpVersion"
     // Ext
-    implementation "com.seiko.net:nethttp-ext-flow:$netHttpVersion"
-    implementation "com.seiko.net:nethttp-ext-rx:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:ext-flow:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:ext-rx:$netHttpVersion"
     // Converter
-    implementation "com.seiko.net:nethttp-converter-moshi:$netHttpVersion"
-    implementation "com.seiko.net:nethttp-converter-gson:$netHttpVersion"
-    implementation "com.seiko.net:nethttp-converter-fastjson:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:converter-moshi:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:converter-gson:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:converter-fastjson:$netHttpVersion"
     // Download
-    implementation "com.seiko.net:nethttp-download-flow:$netHttpVersion"
-    implementation "com.seiko.net:nethttp-download-rx:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:download-flow:$netHttpVersion"
+    implementation "com.github.qdsfdhvh.nethttp:download-rx:$netHttpVersion"
 }
 ```
 
