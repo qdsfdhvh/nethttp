@@ -1,20 +1,27 @@
 package com.seiko.net
 
-import com.seiko.net.parser.toBodyString
-import com.seiko.net.parser.toConvert
-import com.seiko.net.parser.toOkResponse
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.internal.operators.single.SingleFromCallable
+import io.reactivex.rxjava3.internal.operators.single.SingleCreate
 import okhttp3.Response
+import java.io.IOException
+import java.lang.reflect.Type
 
-fun NetHttp.Call.asSingleOkResponse(): Single<Response> =
-  SingleFromCallable { toOkResponse() }.subscribeOn(scheduler())
+fun <T> NetHttp.Call.asSingle(parser: Parser<T>): Single<T> = SingleCreate { emitter ->
+  enqueue(parser, object : NetHttp.Callback<T> {
+    override fun onSuccess(data: T) {
+      emitter.onSuccess(data)
+    }
 
-fun NetHttp.Call.asSingleString(): Single<String> =
-  SingleFromCallable { toBodyString() }.subscribeOn(scheduler())
+    override fun onFailure(e: IOException) {
+      emitter.onError(e)
+    }
+  })
+}
 
-fun <T> NetHttp.Call.asSingle(cls: Class<T>): Single<T> =
-  SingleFromCallable { toConvert<T>(cls) }.subscribeOn(scheduler())
+fun NetHttp.Call.asSingleOkResponse(): Single<Response> = asSingle(ResponseParser)
 
-inline fun <reified T> NetHttp.Call.asSingle(): Single<T> =
-  SingleFromCallable { toConvert<T>() }.subscribeOn(scheduler())
+fun NetHttp.Call.asSingleString(): Single<String> = asSingle(StringParser)
+
+fun <T> NetHttp.Call.asSingle(type: Type): Single<T> = asSingle(convertParser(type))
+
+inline fun <reified T> NetHttp.Call.asSingle(): Single<T> = asSingle(object : TypeLiteral<T>() {}.type)

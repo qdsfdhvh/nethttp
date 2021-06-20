@@ -1,14 +1,19 @@
-package com.seiko.net.util
+package com.seiko.net
 
-import com.seiko.net.Converter
 import okhttp3.RequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 open class TypeLiteral<T> {
   val type: Type
     get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
+}
+
+fun Response.throwIfFatal(): ResponseBody {
+  if (isSuccessful) return body!!
+  throw HttpStatusCodeException(this)
 }
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")

@@ -19,8 +19,10 @@ class UploadViewModel : BaseRxViewModel() {
 
   // haven't test
   fun upload(context: Context, uri: Uri) {
-    DownloadNetHttp.postMultiForm(UPLOAD_URL)
-      .addUri(context, "uploaded_file", uri)
+    DownloadNetHttp
+      .postMultiForm(UPLOAD_URL) {
+        addUri(context, "uploaded_file", uri)
+      }
       .asFlowString()
       .catch {
         Timber.w(it)

@@ -7,9 +7,11 @@ import com.seiko.net.converter.gson.GsonConverter
 import com.seiko.net.converter.moshi.MoshiConverter
 import com.seiko.okhttp.flow.util.createLoggingInterceptor
 import com.squareup.moshi.Moshi
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 import okhttp3.logging.HttpLoggingInterceptor.Level.HEADERS
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 object Global {
@@ -35,7 +37,9 @@ object Global {
   }
 
   private fun createDownloadOkHttpClient(): OkHttpClient {
+    val executors = Executors.newCachedThreadPool()
     return OkHttpClient.Builder()
+      .dispatcher(Dispatcher(executors))
       .addInterceptor(createLoggingInterceptor(HEADERS))
       .connectTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(15, TimeUnit.SECONDS)

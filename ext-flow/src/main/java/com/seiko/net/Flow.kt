@@ -1,21 +1,29 @@
 package com.seiko.net
 
-import com.seiko.net.parser.toBodyString
-import com.seiko.net.parser.toConvert
-import com.seiko.net.parser.toOkResponse
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.callbackFlow
 import okhttp3.Response
+import java.io.IOException
+import java.lang.reflect.Type
 
-fun NetHttp.Call.asFlowOkResponse(): Flow<Response> =
-  flow { emit(toOkResponse()) }.flowOn(dispatcher())
+fun <T> NetHttp.Call.asFlow(parser: Parser<T>): Flow<T> = callbackFlow {
+  enqueue(parser, object : NetHttp.Callback<T> {
+    override fun onSuccess(data: T) {
+      trySend(data)
+    }
 
-fun NetHttp.Call.asFlowString(): Flow<String> =
-  flow { emit(toBodyString()) }.flowOn(dispatcher())
+    override fun onFailure(e: IOException) {
+      close(e)
+    }
+  })
+  awaitClose()
+}
 
-fun <T> NetHttp.Call.asFlow(cls: Class<T>): Flow<T> =
-  flow { emit(toConvert<T>(cls)) }.flowOn(dispatcher())
+fun NetHttp.Call.asFlowOkResponse(): Flow<Response> = asFlow(ResponseParser)
 
-inline fun <reified T> NetHttp.Call.asFlow(): Flow<T> =
-  flow { emit(toConvert<T>()) }.flowOn(dispatcher())
+fun NetHttp.Call.asFlowString(): Flow<String> = asFlow(StringParser)
+
+fun <T> NetHttp.Call.asFlow(type: Type): Flow<T> = asFlow(convertParser(type))
+
+inline fun <reified T> NetHttp.Call.asFlow(): Flow<T> = asFlow(object : TypeLiteral<T>() {}.type)

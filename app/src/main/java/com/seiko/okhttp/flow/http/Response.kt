@@ -1,21 +1,11 @@
 package com.seiko.okhttp.flow.http
 
-import com.seiko.net.NetHttp
-import com.seiko.net.dispatcher
-import com.seiko.net.exception.ParseException
-import com.seiko.net.parser.Parser
-import com.seiko.net.parser.useParse
-import com.seiko.net.scheduler
-import com.seiko.net.util.TypeLiteral
-import com.seiko.net.util.convert
+import com.seiko.net.*
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.internal.operators.single.SingleFromCallable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import java.lang.reflect.Type
 
 @JsonClass(generateAdapter = true)
@@ -39,18 +29,22 @@ class ResponseParser<T>(
       if (type == String::class.java) return "" as T
       if (type == Boolean::class.javaObjectType) return true as T
     }
-    throw ParseException(result.code.toString(), result.msg, response)
+    throw ResponseParseException(result.code.toString(), result.msg, response)
   }
 }
 
-fun <T : Any> NetHttp.Call.toResponse(type: Type): T =
-  useParse(ResponseParser(this, type))
+fun <T : Any> NetHttp.Call.toResponse(type: Type): T = execute(ResponseParser(this, type))
 
-inline fun <reified T : Any> NetHttp.Call.toResponse(): T =
-  toResponse(object : TypeLiteral<T>() {}.type)
+inline fun <reified T : Any> NetHttp.Call.toResponse(): T = toResponse(object : TypeLiteral<T>() {}.type)
 
-inline fun <reified T : Any> NetHttp.Call.asFlowResponse(): Flow<T> =
-  flow { emit(toResponse<T>()) }.flowOn(dispatcher())
+fun <T : Any> NetHttp.Call.asResponse(type: Type, callback: NetHttp.Callback<T>) = enqueue(ResponseParser(this, type), callback)
 
-inline fun <reified T : Any> NetHttp.Call.asSingleResponse(): Single<T> =
-  SingleFromCallable { toResponse<T>() }.subscribeOn(scheduler())
+inline fun <reified T : Any> NetHttp.Call.asResponse(callback: NetHttp.Callback<T>) = asResponse(object : TypeLiteral<T>() {}.type, callback)
+
+fun <T : Any> NetHttp.Call.asFlowResponse(type: Type): Flow<T> = asFlow(ResponseParser(this, type))
+
+inline fun <reified T : Any> NetHttp.Call.asFlowResponse(): Flow<T> = asFlowResponse(object : TypeLiteral<T>() {}.type)
+
+fun <T : Any> NetHttp.Call.asSingleResponse(type: Type): Single<T> = asSingle(ResponseParser(this, type))
+
+inline fun <reified T : Any> NetHttp.Call.asSingleResponse(): Single<T> = asSingleResponse(object : TypeLiteral<T>() {}.type)

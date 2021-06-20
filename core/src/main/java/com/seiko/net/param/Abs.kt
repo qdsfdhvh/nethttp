@@ -1,15 +1,15 @@
 package com.seiko.net.param
 
 import com.seiko.net.NetHttp
-import com.seiko.net.model.KeyValue
-import com.seiko.net.util.addQueryParameters
+import com.seiko.net.internal.KeyValue
+import com.seiko.net.internal.util.addQueryParameters
 import okhttp3.Call
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
 interface ParamNetHttp : NetHttp.Call {
   fun buildRequest(): Request
@@ -19,54 +19,7 @@ abstract class AbsParamNetHttp(netHttp: NetHttp) : ParamNetHttp, NetHttp by netH
   override fun newCall(): Call = okHttpClient().newCall(buildRequest())
 }
 
-@Suppress("UNCHECKED_CAST")
-abstract class AbsHeaderParamNetHttp<out T : AbsParamNetHttp>(netHttp: NetHttp) :
-  AbsParamNetHttp(netHttp) {
-
-  fun addQuery(key: String, value: Any, encode: Boolean = false): T {
-    requestParams().addQuery(key, value, encode)
-    return this as T
-  }
-
-  fun addEncodedQuery(key: String, value: Any): T {
-    requestParams().addEncodedQuery(key, value)
-    return this as T
-  }
-
-  fun addHeader(name: String, value: Date): T {
-    requestParams().addHeader(name, value)
-    return this as T
-  }
-
-  fun addHeader(name: String, value: Instant): T {
-    requestParams().addHeader(name, value)
-    return this as T
-  }
-
-  fun addHeader(name: String, value: String): T {
-    requestParams().addHeader(name, value)
-    return this as T
-  }
-
-  fun addHeaders(headers: Map<String, String>): T {
-    requestParams().addHeaders(headers)
-    return this as T
-  }
-
-  fun header(name: String, value: Date): T {
-    requestParams().header(name, value)
-    return this as T
-  }
-
-  fun header(name: String, value: Instant): T {
-    requestParams().header(name, value)
-    return this as T
-  }
-
-  fun header(name: String, value: String): T {
-    requestParams().header(name, value)
-    return this as T
-  }
+abstract class AbsHeaderParamNetHttp(netHttp: NetHttp) : AbsParamNetHttp(netHttp) {
 
   abstract fun requestParams(): HeaderRequestParams
 

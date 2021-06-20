@@ -24,7 +24,12 @@ subprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
             jvmTarget = '1.8'
-            freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+            freeCompilerArgs += "-Xuse-experimental=" +
+                    "kotlin.Experimental," +
+                    "kotlinx.coroutines.ExperimentalCoroutinesApi," +
+                    "kotlinx.coroutines.InternalCoroutinesApi," +
+                    "kotlinx.coroutines.FlowPreview"
         }
     }
 }

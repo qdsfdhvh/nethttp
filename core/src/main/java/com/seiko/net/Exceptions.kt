@@ -1,15 +1,13 @@
-package com.seiko.net.exception
+package com.seiko.net
 
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.Response
 import java.io.IOException
 
-class HttpStatusCodeException(
-  response: Response
-) : IOException(response.message)
+class HttpStatusCodeException(response: Response) : IOException(response.message)
 
-class ParseException(
+class ResponseParseException(
   private val errorCode: String,
   errorMessage: String,
   response: Response

@@ -21,38 +21,36 @@ class RxJavaViewModel : BaseRxViewModel() {
   val body = mutableStateOf("")
 
   fun sendGet() {
-    RxNetHttp
+    NetHttp
       .get("/article/list/0/json") {
         addQuery("key11", 111)
         addEncodedQuery("key11", "ccc")
         addHeader("test_header_01", "value1")
         header("test_header_02", "value1")
       }
-      .addQuery("key22", 111)
-      .addEncodedQuery("key22", "asddaas")
-      .addHeader("test_header_01", "value2")
-      .header("test_header_02", "value2")
       .asSingle<Response<Page<ListResponse>>>()
       .map { it.data!!.datas[0].toString() }
+      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ showBody(it) }, { Timber.w(it) })
       .addToDisposables()
   }
 
   fun sendPostForm() {
-    RxNetHttp
+    NetHttp
       .postForm("/article/query/0/json") {
         add("k", "性能优化")
       }
       .asSingleResponse<Page<ListResponse>>()
       .map { it.datas[1].toString() }
+      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ showBody(it) }, { Timber.w(it) })
       .addToDisposables()
   }
 
   fun sendPostJson() {
-    MyRxNetHttp
+    GsonNetHttp
       .postJson("/banner/json") {
         add("name", "张三")
         add("sex", 1)
@@ -63,6 +61,7 @@ class RxJavaViewModel : BaseRxViewModel() {
       }
       .asSingleResponse<List<BannerResponse>>()
       .map { it[0].toString() }
+      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ showBody(it) }, { Timber.w(it) })
       .addToDisposables()
@@ -81,6 +80,7 @@ class RxJavaViewModel : BaseRxViewModel() {
       }
       .asSingle<Response<List<BannerResponse>>>()
       .map { it.data!![1].toString() }
+      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ showBody(it) }, { Timber.w(it) })
       .addToDisposables()
@@ -89,10 +89,10 @@ class RxJavaViewModel : BaseRxViewModel() {
   fun fastJsonParse() {
     NetHttp
       .setConverter(Global.fastJsonConverter)
-      .setScheduler(Schedulers.computation())
       .get("/banner/json")
       .asSingleResponse<List<BannerResponse>>()
       .map { it[2].toString() }
+      .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ showBody(it) }, { Timber.w(it) })
       .addToDisposables()

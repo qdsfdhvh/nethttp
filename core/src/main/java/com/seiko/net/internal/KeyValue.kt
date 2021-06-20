@@ -1,6 +1,6 @@
-package com.seiko.net.model
+package com.seiko.net.internal
 
-data class KeyValue(
+internal data class KeyValue(
   val key: String,
   val value: Any,
   val encode: Boolean = false,

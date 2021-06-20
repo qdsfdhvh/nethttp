@@ -1,4 +1,4 @@
-package com.seiko.net.util
+package com.seiko.net.internal.util
 
 import android.content.ContentResolver
 import android.content.Context
@@ -9,8 +9,7 @@ import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
 
-
-fun Uri.asRequestBody(
+internal fun Uri.asRequestBody(
   context: Context,
   contentType: MediaType? = null
 ): RequestBody {
@@ -21,7 +20,7 @@ fun Uri.asRequestBody(
   )
 }
 
-class UriRequestBody(
+private class UriRequestBody(
   private val uri: Uri,
   private val contentType: MediaType?,
   private val contentResolver: ContentResolver,

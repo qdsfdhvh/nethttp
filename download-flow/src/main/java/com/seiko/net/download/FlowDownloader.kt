@@ -10,8 +10,10 @@ interface FlowDownloader {
   fun download(taskInfo: TaskInfo, response: Response): Flow<Progress>
 
   fun get(taskInfo: TaskInfo, headers: Map<String, String>): Flow<Response> {
-    return taskInfo.netHttp.get(taskInfo.task.url)
-      .addHeaders(headers)
+    return taskInfo.netHttp
+      .get(taskInfo.task.url) {
+        addHeaders(headers)
+      }
       .asFlowOkResponse()
   }
 }

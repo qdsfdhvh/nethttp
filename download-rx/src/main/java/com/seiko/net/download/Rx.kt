@@ -1,7 +1,6 @@
 package com.seiko.net.download
 
 import com.seiko.net.NetHttp
-import com.seiko.net.scheduler
 import io.reactivex.rxjava3.core.Flowable
 
 fun NetHttp.downloadRx(
@@ -38,6 +37,5 @@ fun NetHttp.downloadRx(
   return downloader.get(taskInfo, headers)
     .flatMapPublisher { response ->
       downloader.download(taskInfo, response)
-        .subscribeOn(scheduler())
     }
 }

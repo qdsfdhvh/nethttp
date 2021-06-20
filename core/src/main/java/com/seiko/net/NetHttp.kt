@@ -1,8 +1,8 @@
 package com.seiko.net
 
 import androidx.annotation.WorkerThread
-import com.seiko.net.util.wrapperUrl
 import okhttp3.OkHttpClient
+import java.io.IOException
 
 interface NetHttp {
 
@@ -15,6 +15,11 @@ interface NetHttp {
   interface Call : NetHttp {
     @WorkerThread
     fun newCall(): okhttp3.Call
+  }
+
+  interface Callback<in T> {
+    fun onSuccess(data: T)
+    fun onFailure(e: IOException)
   }
 
   companion object : NetHttp {

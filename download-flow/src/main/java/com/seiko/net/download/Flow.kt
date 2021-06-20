@@ -1,7 +1,6 @@
 package com.seiko.net.download
 
 import com.seiko.net.NetHttp
-import com.seiko.net.dispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
@@ -43,7 +42,6 @@ fun NetHttp.downloadFlow(
   return downloader.get(taskInfo, headers)
     .flatMapConcat { response ->
       downloader.download(taskInfo, response)
-        .flowOn(dispatcher())
     }
     .conflate()
 }

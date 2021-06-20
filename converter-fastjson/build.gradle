@@ -4,6 +4,9 @@ apply plugin: 'java-library'
 dependencies {
     api project(':core')
     api "com.alibaba:fastjson:$versions.fastjson"
+
+    // com.alibaba.fastjson.JSONException: default constructor not found
+    api "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
