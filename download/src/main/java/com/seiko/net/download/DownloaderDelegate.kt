@@ -15,14 +15,14 @@ abstract class DownloaderDelegate {
   protected lateinit var file: File
   protected lateinit var shadowFile: File
 
-  protected fun beforeDownload(task: Task, response: Response) {
+  protected fun beforeDownload(task: Task, response: Response, isClearCache: Boolean) {
     val fileDir = task.getDir()
     if (!fileDir.exists() || !fileDir.isDirectory) {
       fileDir.mkdirs()
     }
 
     if (file.exists()) {
-      if (file.length() == response.headersContentLength()) {
+      if (!isClearCache && file.length() == response.headersContentLength()) {
         alreadyDownloaded = true
         return
       }

@@ -5,7 +5,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOn
 
 fun NetHttp.downloadFlow(
   url: String,
@@ -14,6 +13,7 @@ fun NetHttp.downloadFlow(
   headers: Map<String, String> = RANGE_CHECK_HEADER,
   maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
   rangeSize: Long = DEFAULT_RANGE_SIZE,
+  isClearCache: Boolean = false,
   downloader: FlowDownloader = FlowDownloaderProxy,
 ): Flow<Progress> =
   downloadFlow(
@@ -21,6 +21,7 @@ fun NetHttp.downloadFlow(
     headers = headers,
     maxConCurrency = maxConCurrency,
     rangeSize = rangeSize,
+    isClearCache = isClearCache,
     downloader = downloader,
   )
 
@@ -30,6 +31,7 @@ fun NetHttp.downloadFlow(
   headers: Map<String, String> = RANGE_CHECK_HEADER,
   maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
   rangeSize: Long = DEFAULT_RANGE_SIZE,
+  isClearCache: Boolean = false,
   downloader: FlowDownloader = FlowDownloaderProxy,
 ): Flow<Progress> {
   require(rangeSize > 1024 * 1024) { "rangeSize must be greater than 1M" }
@@ -37,6 +39,7 @@ fun NetHttp.downloadFlow(
     task = task,
     maxConCurrency = maxConCurrency,
     rangeSize = rangeSize,
+    isClearCache = isClearCache,
     netHttp = this
   )
   return downloader.get(taskInfo, headers)

@@ -23,6 +23,7 @@ class DownloadViewModel : BaseRxViewModel() {
       .downloadRx(
         url = "https://dldir1.qq.com/weixin/android/weixin706android1460.apk",
         savePath = context.defaultDownloadDir(),
+        isClearCache = true,
       )
       .map { "${it.downloadSizeFormat}/${it.totalSizeFormat}" }
       .observeOn(AndroidSchedulers.mainThread())
@@ -35,6 +36,7 @@ class DownloadViewModel : BaseRxViewModel() {
       .downloadFlow(
         url = "https://dldir1.qq.com/weixin/android/weixin706android1460.apk",
         savePath = context.defaultDownloadDir(),
+        isClearCache = true,
       )
       .map { "${it.downloadSizeFormat}/${it.totalSizeFormat}" }
       .catch { Timber.w(it) }

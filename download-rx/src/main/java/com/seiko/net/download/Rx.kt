@@ -10,6 +10,7 @@ fun NetHttp.downloadRx(
   headers: Map<String, String> = RANGE_CHECK_HEADER,
   maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
   rangeSize: Long = DEFAULT_RANGE_SIZE,
+  isClearCache: Boolean = false,
   downloader: RxDownloader = RxDownloadProxy,
 ): Flowable<Progress> =
   downloadRx(
@@ -17,6 +18,7 @@ fun NetHttp.downloadRx(
     headers = headers,
     maxConCurrency = maxConCurrency,
     rangeSize = rangeSize,
+    isClearCache = isClearCache,
     downloader = downloader,
   )
 
@@ -25,6 +27,7 @@ fun NetHttp.downloadRx(
   headers: Map<String, String> = RANGE_CHECK_HEADER,
   maxConCurrency: Int = DEFAULT_MAX_CONCURRENCY,
   rangeSize: Long = DEFAULT_RANGE_SIZE,
+  isClearCache: Boolean = false,
   downloader: RxDownloader = RxDownloadProxy,
 ): Flowable<Progress> {
   require(rangeSize > 1024 * 1024) { "rangeSize must be greater than 1M" }
@@ -32,6 +35,7 @@ fun NetHttp.downloadRx(
     task = task,
     maxConCurrency = maxConCurrency,
     rangeSize = rangeSize,
+    isClearCache = isClearCache,
     netHttp = this
   )
   return downloader.get(taskInfo, headers)

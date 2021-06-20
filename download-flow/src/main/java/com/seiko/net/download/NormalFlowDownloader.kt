@@ -1,7 +1,7 @@
 package com.seiko.net.download
 
 import com.seiko.net.download.util.shadow
-import com.seiko.net.util.throwIfFatal
+import com.seiko.net.throwIfFatal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,7 +21,7 @@ class NormalFlowDownloader : DownloaderDelegate(), FlowDownloader {
     file = task.getFile()
     shadowFile = file.shadow()
 
-    beforeDownload(task, response)
+    beforeDownload(task, response, taskInfo.isClearCache)
 
     val totalSize = response.headersContentLength()
     if (alreadyDownloaded) {

@@ -2,7 +2,7 @@ package com.seiko.net.download
 
 import com.seiko.net.download.util.shadow
 import com.seiko.net.download.util.tmp
-import com.seiko.net.util.throwIfFatal
+import com.seiko.net.throwIfFatal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -22,7 +22,7 @@ class RangeFlowDownloader : DownloaderRangeDelegate(), FlowDownloader {
     shadowFile = file.shadow()
     tmpFile = file.tmp()
 
-    beforeDownload(taskInfo, response)
+    beforeDownload(taskInfo, response, taskInfo.isClearCache)
 
     if (alreadyDownloaded) {
       val totalSize = response.headersContentLength()

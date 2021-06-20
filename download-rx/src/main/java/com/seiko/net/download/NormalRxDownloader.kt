@@ -1,7 +1,7 @@
 package com.seiko.net.download
 
 import com.seiko.net.download.util.shadow
-import com.seiko.net.util.throwIfFatal
+import com.seiko.net.throwIfFatal
 import io.reactivex.rxjava3.core.Emitter
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.functions.BiConsumer
@@ -23,7 +23,7 @@ class NormalRxDownloader : DownloaderDelegate(), RxDownloader {
     file = task.getFile()
     shadowFile = file.shadow()
 
-    beforeDownload(task, response)
+    beforeDownload(task, response, taskInfo.isClearCache)
 
     val totalSize = response.headersContentLength()
     if (alreadyDownloaded) {

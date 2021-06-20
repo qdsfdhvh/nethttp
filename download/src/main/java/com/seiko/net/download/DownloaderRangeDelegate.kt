@@ -19,20 +19,20 @@ abstract class DownloaderRangeDelegate {
   protected lateinit var tmpFile: File
   protected lateinit var rangeTmpFile: RangeTmpFile
 
-  protected fun beforeDownload(taskInfo: TaskInfo, response: Response) {
+  protected fun beforeDownload(taskInfo: TaskInfo, response: Response, isClearCache: Boolean) {
     val fileDir = taskInfo.task.getDir()
     if (!fileDir.exists() || !fileDir.isDirectory) {
       fileDir.mkdirs()
     }
 
     if (file.exists()) {
-      if (file.length() == response.headersContentLength()) {
+      if (!isClearCache && file.length() == response.headersContentLength()) {
         alreadyDownloaded = true
         return
       }
       file.delete()
     }
-    if (shadowFile.exists() && tmpFile.exists()) {
+    if (!isClearCache && shadowFile.exists() && tmpFile.exists()) {
       rangeTmpFile = RangeTmpFile(tmpFile)
       if (rangeTmpFile.read(taskInfo, response)) {
         return
